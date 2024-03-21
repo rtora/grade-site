@@ -41,7 +41,7 @@ class GradeData(Base):
     DFWU = Column(Float)
     Pending_Judicial_Action = Column('Pending Judicial Action',Float)
     Withheld = Column(Float)
-    Report_In_Progress = Column(Float)
+    Report_In_Progress = Column('Report In Progress', Float)
     I_RD_RP = Column('I,RD,RP',Float)
     wo_I_RD_RP = Column('w/o I RD RP', Float)  
     # Adjusted the variable name and corrected 'Column'

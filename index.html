@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Data Dashboard</title>
+    <link rel="stylesheet" href="style.css"> <!-- If you have custom styles -->
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Home/Reset</a></li>
+                <li><a href="/about.html">About</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div id="filters">
+            <!-- Add your filter inputs here, e.g., for 'instructor' -->
+            <input type="text" id="instructor" placeholder="Instructor">
+            <!-- Repeat for other filters: year, catalog_number, etc. -->
+        </div>
+        <button id="submit">Submit</button>
+        <div id="results">
+            <!-- Graph and JSON results will be inserted here -->
+        </div>
+    </main>
+    <script src="script.js"></script> <!-- Your JavaScript file -->
+</body>
+</html>
