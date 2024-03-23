@@ -18,14 +18,22 @@
     <main>
         <div id="filters">
             <!-- Add your filter inputs here, e.g., for 'instructor' -->
-            <input type="text" id="instructor" placeholder="Instructor">
+            <input type="text" id="instructor" placeholder="Instructor" autocomplete="off">
+            <input type="text" id="year" placeholder="Year" autocomplete="off">
+            <input type="text" id="catalog_number" placeholder="Catalog Number" autocomplete="off">
+            <input type="text" id="subject" placeholder="Subject" autocomplete="off">
+            <input type="text" id="term" placeholder="Term" autocomplete="off">
+            <input type="text" id="university" placeholder="University" autocomplete="off">
+            <input type="text" id="title" placeholder="Title" autocomplete="off">
             <!-- Repeat for other filters: year, catalog_number, etc. -->
         </div>
         <button id="submit">Submit</button>
-        <div id="results">
-            <!-- Graph and JSON results will be inserted here -->
+        <div>
+            <canvas id="gradesChart"></canvas>
         </div>
+        <div id="results"></div> <!-- Container for displaying JSON data -->
     </main>
     <script src="script.js"></script> <!-- Your JavaScript file -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>

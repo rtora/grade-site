@@ -36,3 +36,24 @@ header nav ul li a {
 #results {
     margin-top: 20px;
 }
+
+
+.autocomplete-suggestions {
+    border: 1px solid #ccc;
+    border-top: none;
+    position: absolute;
+    z-index: 1000;
+    width: calc(100% - 2px); /* Adjust width as necessary */
+    background: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,.1);
+}
+
+.suggestion-item {
+    padding: 8px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.suggestion-item:hover {
+    background-color: #f2f2f2;
+}
