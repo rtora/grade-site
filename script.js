@@ -92,11 +92,12 @@ let hideSuggestionTimeout; // Declare a global variable for the hide timeout
 
 function displaySuggestions(suggestions, inputElement, filterField) {
     clearSuggestions(inputElement);
+    inputElement.style.position = 'relative';
 
     // Create a container for the suggestions if it doesn't already exist
     let suggestionBox = document.createElement('div');
     suggestionBox.className = 'autocomplete-suggestions';
-    inputElement.parentNode.appendChild(suggestionBox);
+    inputElement.after(suggestionBox);
 
     suggestions.forEach((item) => {
         let suggestionItem = document.createElement('div');
@@ -238,18 +239,18 @@ function displayGradesResults(data, university) {
     if (university === 'Cal State East Bay') {
         gradeLabels = ['A', 'B', 'C', 'DFWU'];
         gradeData = [
-            data['A'] + data['A_plus'] + data['A_minus'], 
-            data['B'] + data['B_plus'] + data['B_minus'],
-            data['C'] + data['C_plus'] + data['C_minus'],
+            data['A_plus'] + data['A'] + data['A_minus'], 
+            data['B_plus'] + data['B'] + data['B_minus'],
+            data['C_plus'] + data['C'] + data['C_minus'],
             data['DFWU']
         ];
     } else if (university === 'UC San Diego') {
         gradeLabels = ['A', 'B', 'C', 'D', 'F'];
         gradeData = [
-            data['A'] + data['A_plus'] + data['A_minus'], 
-            data['B'] + data['B_plus'] + data['B_minus'],
-            data['C'] + data['C_plus'] + data['C_minus'],
-            data['D'] + data['D_plus'] + data['D_minus'],
+            data['A_plus'] + data['A'] + data['A_minus'], 
+            data['B_plus'] + data['B'] + data['B_minus'],
+            data['C_plus'] + data['C'] + data['C_minus'],
+            data['D_plus'] + data['D'] + data['D_minus'],
             data['F']
         ];
     }
@@ -261,16 +262,47 @@ function displayGradesResults(data, university) {
             labels: gradeLabels,
             datasets: [{
                 label: 'Grade Distribution',
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: '#E0E1DD',
+                borderColor: '#E0E1DD',
                 borderWidth: 1,
                 data: gradeData,
+                color: '#E0E1DD',
             }]
         },
         options: {
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#0D1B2A' // Change font color of y-axis labels
+                    },
+                    title: {
+                        display: true,
+                        text: 'Grade Count', // Optional: if you have a title
+                        color: '#0D1B2A' // Change font color of the y-axis title
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#0D1B2A' // Change font color of x-axis labels
+                    },
+                    title: {
+                        display: true,
+                        text: 'Letter Grade', // Optional: if you have a title
+                        color: '#0D1B2A' // Change font color of the x-axis title
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#0D1B2A' // Ensures legend labels match axis labels
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Number of Grades Given', // Optional: if you have a chart title
+                    color: '#0D1B2A' // Change font color of the chart title
                 }
             }
         }
@@ -323,13 +355,36 @@ function displayGradesResults(data, university) {
             return acc;
     }, {});
 
+    // Define the desired order of grades
+    const gradeOrder = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'];
+
+    // Convert the gradeOrder to a mapping for easier comparison
+    const gradeOrderMap = gradeOrder.reduce((acc, grade, index) => {
+        acc[grade] = index;
+        return acc;
+    }, {});
+
+    // Sort the keys of filteredData based on the custom grade order
+    const sortedDataKeys = Object.keys(filteredData).sort((a, b) => {
+        // Use the gradeOrderMap to get the order index
+        const orderA = gradeOrderMap[a] !== undefined ? gradeOrderMap[a] : gradeOrder.length;
+        const orderB = gradeOrderMap[b] !== undefined ? gradeOrderMap[b] : gradeOrder.length;
+        return orderA - orderB;
+    });
+
+    // Use the sorted keys to construct the sortedData object
+    const sortedData = sortedDataKeys.reduce((acc, key) => {
+        acc[key] = filteredData[key];
+        return acc;
+    }, {});
+
     // Add a title for the section
     const titleElement = document.createElement('h2');
     titleElement.textContent = 'Grades Given';
     resultsContainer.appendChild(titleElement);
 
     // Construct a string with the desired format: key: value\n (without curly braces, quotes on keys, and commas)
-    let formattedString = Object.entries(filteredData).map(([key, value]) => {
+    let formattedString = Object.entries(sortedData).map(([key, value]) => {
         return `${key}: ${value}`;
     }).join('\n');
 
@@ -340,10 +395,3 @@ function displayGradesResults(data, university) {
     // Append the JSON data underneath the title
     resultsContainer.appendChild(pre);
 }
-/***********************
- * TODO
- * 1. Fix JSON Format
- * 2. Add default autocomplete for Term and university
- *  a. university should filter on a fixed list
- * 3. 
- */
