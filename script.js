@@ -21,6 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (inputElement) {
             const debouncedAutocomplete = debounce(() => autocomplete(inputElement, filterId), 500);
             inputElement.addEventListener('input', debouncedAutocomplete); // Use debounced function here.
+            inputElement.addEventListener('blur', () => {
+                hideSuggestionTimeout = setTimeout(() => clearSuggestions(inputElement), 200); // Use a timeout to delay hiding
+            });
         }
     });
     const submitButton = document.getElementById('submit');
@@ -30,28 +33,28 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function autocomplete(inputElement, filterField) {
-    console.log(`Autocomplete triggered for: ${filterField}`);
+    //console.log(`Autocomplete triggered for: ${filterField}`);
 
     // Get all filter values except the current one being typed into
     const filters = getFilters();
-    console.log('Current filters:', filters);
+    //console.log('Current filters:', filters);
 
     // Construct the query string with all filters except the current one
     const queryString = Object.keys(filters)
         .filter(key => filters[key] && key !== filterField) // Keep only non-empty values and exclude current field
         .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(filters[key])}`)
         .join('&');
-    console.log('Constructed query string:', queryString);
+    //console.log('Constructed query string:', queryString);
 
     // Prepare the current field and its value for the URL
     const currentFieldQuery = `autocomplete_field=${encodeURIComponent(filterField)}&search=${encodeURIComponent(inputElement.value.trim())}`;
 
     // Combine the current field query with the rest of the filters
     const combinedQueryString = queryString.length > 0 ? `${currentFieldQuery}&${queryString}` : currentFieldQuery;
-    console.log('Combined query string:', combinedQueryString);
+    //console.log('Combined query string:', combinedQueryString);
 
     const fetchUrl = `http://127.0.0.1:5000/autocomplete?${combinedQueryString}`;
-    console.log('Fetching URL:', fetchUrl);
+    //console.log('Fetching URL:', fetchUrl);
 
     fetch(fetchUrl)
         .then(response => {
@@ -61,11 +64,11 @@ function autocomplete(inputElement, filterField) {
             return response.json();
         })
         .then(data => {
-            console.log('Data received from autocomplete:', data);
+            //console.log('Data received from autocomplete:', data);
             displaySuggestions(data, inputElement, filterField);
         })
         .catch(error => {
-            console.error('Error:', error);
+            //console.error('Error:', error);
         });
 }
 
@@ -78,13 +81,14 @@ function getFilters() {
         const inputElement = document.getElementById(filterId);
         if (inputElement && inputElement.value.trim()) {
             filters[filterId] = inputElement.value.trim();
-            console.log(`Filter [${filterId}] has value:`, inputElement.value.trim());
+            //console.log(`Filter [${filterId}] has value:`, inputElement.value.trim());
         }
     });
     return filters;
 }
 
 // displaySuggestions and clearSuggestions remain unchanged from the previous explanation.
+let hideSuggestionTimeout; // Declare a global variable for the hide timeout
 
 function displaySuggestions(suggestions, inputElement, filterField) {
     clearSuggestions(inputElement);
@@ -99,6 +103,7 @@ function displaySuggestions(suggestions, inputElement, filterField) {
         suggestionItem.className = 'suggestion-item';
         suggestionItem.textContent = item;
         suggestionItem.addEventListener('click', () => {
+            clearTimeout(hideSuggestionTimeout); // Clear the timeout to prevent the box from hiding
             inputElement.value = item;
             clearSuggestions(inputElement);
         });
@@ -116,17 +121,17 @@ function clearSuggestions(inputElement) {
 function fetchGrades() {
     const filters = getFilters();
     const university = document.getElementById('university').value; // Capture the selected university
-    console.log('Fetching grades with filters:', filters);
+    //console.log('Fetching grades with filters:', filters);
 
     // Construct the query string with all filters
     const queryString = Object.keys(filters)
         .filter(key => filters[key]) // Keep only non-empty values
         .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(filters[key])}`)
         .join('&');
-    console.log('Constructed query string for grades:', queryString);
+    //console.log('Constructed query string for grades:', queryString);
 
     const fetchUrl = `http://127.0.0.1:5000/api/grades?${queryString}`;
-    console.log('Fetching URL for grades:', fetchUrl);
+    //console.log('Fetching URL for grades:', fetchUrl);
 
     fetch(fetchUrl)
         .then(response => {
@@ -136,11 +141,11 @@ function fetchGrades() {
             return response.json();
         })
         .then(data => {
-            console.log('Data received from /api/grades:', data);
+            //console.log('Data received from /api/grades:', data);
             displayGradesResults(data, university); // You need to define this
         })
         .catch(error => {
-            console.error('Error fetching grades:', error);
+            //console.error('Error fetching grades:', error);
         });
 }
 
@@ -186,13 +191,16 @@ function calculateAverageGPA(data, useProvidedGPA = false) {
     return totalGrades > 0 ? totalPoints / totalGrades : 0;
 }
   
+function truncateToTwoDecimals(num) {
+    return Math.trunc(num * 100) / 100;
+}
 
 function displayGradesResults(data, university) {
     // Determine whether to use the provided GPA or calculate it
-    console.log('Received data:', data); // Check the entire data structure
-    console.log('University:', university); // Specifically check the university value
+    //console.log('Received data:', data); // Check the entire data structure
+    //console.log('University:', university); // Specifically check the university value
     const useProvidedGPA = university === 'UC San Diego';
-    console.log('Using provided GPA?', useProvidedGPA);
+    //console.log('Using provided GPA?', useProvidedGPA);
     const averageGPA = calculateAverageGPA(data, useProvidedGPA);
 
     // Attempt to find an existing GPA display element
@@ -271,7 +279,7 @@ function displayGradesResults(data, university) {
     // Displaying the JSON data underneath the chart
     const resultsContainer = document.getElementById('results');
     if (!resultsContainer) {
-        console.error('Results container not found');
+        //console.error('Results container not found');
         return;
     }
 
@@ -302,12 +310,16 @@ function displayGradesResults(data, university) {
     const filteredData = Object.entries(data)
         .filter(([key, value]) => {
             // Ensure the key is in the list of relevant grades and the value is greater than 0, excluding 'average_gpa'
-            return relevantGrades.includes(key) || value > 0 && key !== 'average_gpa';
+            return key !== 'average_GPA' && (relevantGrades.includes(key) || value > 0);
         })
         .reduce((acc, [key, value]) => {
             // Convert internal grade identifiers to a more friendly format
-            const simplifiedKey = key.replace('_plus', '+').replace('_minus', '-');
-            acc[simplifiedKey] = value;
+            const simplifiedKey = key.replace(/_plus/g, '+').replace(/_minus/g, '-').replace(/_/g, ' ');
+            if(typeof value == 'number'){
+                acc[simplifiedKey] = truncateToTwoDecimals(value);
+            }else{
+                acc[simplifiedKey] = value;
+            }
             return acc;
     }, {});
 
@@ -316,13 +328,22 @@ function displayGradesResults(data, university) {
     titleElement.textContent = 'Grades Given';
     resultsContainer.appendChild(titleElement);
 
-    // Convert the filtered data object to a nicely formatted JSON string
-    const jsonData = JSON.stringify(filteredData, null, 2);
+    // Construct a string with the desired format: key: value\n (without curly braces, quotes on keys, and commas)
+    let formattedString = Object.entries(filteredData).map(([key, value]) => {
+        return `${key}: ${value}`;
+    }).join('\n');
 
-    // Create a preformatted text element to display the JSON data
+    // Create and append the formatted text to the resultsContainer
     const pre = document.createElement('pre');
-    pre.textContent = jsonData.replace(/[{}]/g, '');
+    pre.textContent = formattedString;
 
     // Append the JSON data underneath the title
     resultsContainer.appendChild(pre);
 }
+/***********************
+ * TODO
+ * 1. Fix JSON Format
+ * 2. Add default autocomplete for Term and university
+ *  a. university should filter on a fixed list
+ * 3. 
+ */

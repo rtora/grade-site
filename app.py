@@ -92,9 +92,9 @@ def autocomplete():
 
     # Limiting results and ensuring they are not None
     suggestions = [result[0] for result in query.limit(10).all() if result[0] is not None]
-    print("Autocomplete field:", autocomplete_field)
-    print("Selected filters:", selected_filters)
-    print("Search text:", search_text)
+    # print("Autocomplete field:", autocomplete_field)
+    # print("Selected filters:", selected_filters)
+    # print("Search text:", search_text)
 
     session.close()
     return jsonify(suggestions)
