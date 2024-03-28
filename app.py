@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from sqlalchemy import create_engine, func, Float
+from sqlalchemy import create_engine, func, Float, desc
 from sqlalchemy.orm import sessionmaker
 from models import Base, GradeData # Ensure this matches your actual import
 from flask_cors import CORS
@@ -89,6 +89,8 @@ def autocomplete():
     # Apply the search text if provided
     if search_text:
         query = query.filter(getattr(GradeData, autocomplete_field).ilike(f"%{search_text}%"))
+    if autocomplete_field == 'year':
+        query = query.order_by(desc(getattr(GradeData, autocomplete_field)))
 
     # Limiting results and ensuring they are not None
     suggestions = [result[0] for result in query.limit(10).all() if result[0] is not None]

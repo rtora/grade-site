@@ -64,6 +64,10 @@ function autocomplete(inputElement, filterField) {
             return response.json();
         })
         .then(data => {
+            console.log(filterField);
+            if (filterField === 'year'){
+                data.sort((a,b)=>b - a)
+            }
             //console.log('Data received from autocomplete:', data);
             displaySuggestions(data, inputElement, filterField);
         })
