@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>University Grades</title>
     <link rel="stylesheet" href="style.css"> <!-- If you have custom styles -->
+    <link rel="stylesheet" href="about.css"> <!-- If you have custom styles -->
 </head>
 <body>
     <header>
@@ -17,11 +18,38 @@
     </header>
     <main>
         <div id = "about">
-            <h1>Grades Website</h1>
+            <h1 id ="Title">Grades Website</h1>
             <h2>This site is for research purposes only</h2>
             <h2>Project Overview</h2>
-            <p>This repository contains grades data from various University of California (UC) and California State University (CSU) campuses. The data encompasses academic records from the years 2000 to 2023. Each row in the dataset represents a class offered in a specific academic term, along with the count of each type of grade awarded for that class.</p>
-
+            <p>This website contains grades data from various University of California (UC) and California State University (CSU) campuses. The data encompasses academic records from the years 2000 to 2023.</p>
+            <h2>How to Use this Site</h2>
+            <p>You can select as many or as few of the filters as you like. Suggestions will appear beneath your filter box, and you can click on a suggestion to autofill it. Once you are done, click the submit button.</p>
+            <p>Note: Not all filters work with every school. University, Year, Quarter/Semester, Subject, and Catalog Number should work for all schools. Also, filters search based on an exact match, so it is recommended to use the autocomplete suggestions.</p>
+            <h2>Universities with Data</h2>
+            <ul id = "uni">
+                <li>Cal Poly Pomona</li>
+                <li>Cal State LA</li>
+                <li>Chico State</li>
+                <li>CSU Channel Islands</li>
+                <li>Cal State East Bay</li>
+                <li>CSU Northridge</li>
+                <li>Sacramento State</li>
+                <li>CSU San Bernardino</li>
+                <li>CSU San Marcos</li>
+                <li>Stanislaus State</li>
+                <li>Cal Poly Humboldt</li>
+                <li>San Francisco State</li>
+                <li>San Jose State</li>
+                <li>UC Berkeley</li>
+                <li>UC Davis</li>
+                <li>UC Irvine</li>
+                <li>UCLA</li>
+                <li>UC Merced</li>
+                <li>UC Santa Barbara</li>
+                <li>UC Santa Cruz</li>
+                <li>UC San Diego</li>
+            </ul>
+            
             <h2>Data Updates</h2>
             <h3>How often will the data be updated?</h3>
             <p>The data will be updated annually at the beginning of each year.</p>
@@ -30,7 +58,7 @@
             <h3>Why isn't data from my school included?</h3>
             <p>Requests were made for data from every UC and CSU. However, some institutions did not respond, while others requested payment, which was not feasible due to budget constraints. If you wish to fund data acquisition from your university, please contact me. Below is a list of schools from which data was not obtained, including reasons and requested payments:</p>
 
-            <ul>
+            <ul id = "uni">
                 <li>UC Riverside: No response</li>
                 <li>UCSF: Does not keep records</li>
                 <li>CSU Bakersfield: $2000</li>
@@ -38,7 +66,7 @@
                 <li>Fresno State: $2,000</li>
                 <li>CSU Fullerton: $15,000</li>
                 <li>CSU Long Beach: $1,500</li>
-                <li>CAL Maritime: No response</li>
+                <li>Cal Maritime: No response</li>
                 <li>CSU Monterey Bay: $200</li>
                 <li>San Diego State: $5,000</li>
                 <li>Cal Poly San Luis Obispo: $5,000</li>
@@ -46,7 +74,7 @@
                 <li>Stanislaus State: No response</li>
             </ul>
             <h4>2023 grades</h4>
-            <ul>
+            <ul id = "uni">
                 <li>UC Merced: $400</li>
                 <li>UCSC: $300</li>
                 <li>CSUMB: $100</li>
