@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function autocomplete(inputElement, filterField) {
     //console.log(`Autocomplete triggered for: ${filterField}`);
+    displaySearchingMessage(inputElement);
 
     // Get all filter values except the current one being typed into
     const filters = getFilters();
@@ -115,6 +116,16 @@ function displaySuggestions(suggestions, inputElement, filterField) {
         suggestionBox.appendChild(suggestionItem);
     });
 }
+
+function displaySearchingMessage(inputElement) {
+    clearSuggestions(inputElement); // Clears any existing suggestions or messages
+    inputElement.style.position = 'relative';
+    let suggestionBox = document.createElement('div');
+    suggestionBox.className = 'autocomplete-suggestions';
+    suggestionBox.textContent = 'Searching...'; // Set the searching text
+    inputElement.after(suggestionBox);
+}
+
 
 function clearSuggestions(inputElement) {
     let existingSuggestions = inputElement.parentNode.querySelector('.autocomplete-suggestions');

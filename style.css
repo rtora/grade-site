@@ -28,6 +28,11 @@ body {
     padding-bottom: 10px;
 }
 
+#about {
+    padding: 20px; /* Adds space between the text and the border */
+    margin: 50px 0; /* Adds some space outside the div for better layout */
+}
+
 
 /* Styles the <nav> element */
 nav ul {
