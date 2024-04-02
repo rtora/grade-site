@@ -54,7 +54,7 @@ function autocomplete(inputElement, filterField) {
     const combinedQueryString = queryString.length > 0 ? `${currentFieldQuery}&${queryString}` : currentFieldQuery;
     //console.log('Combined query string:', combinedQueryString);
 
-    const fetchUrl = `http://127.0.0.1:5000/autocomplete?${combinedQueryString}`;
+    const fetchUrl = `http://18.119.131.51:5000/autocomplete?${combinedQueryString}`;
     //console.log('Fetching URL:', fetchUrl);
 
     fetch(fetchUrl)
@@ -146,7 +146,7 @@ function fetchGrades() {
         .join('&');
     //console.log('Constructed query string for grades:', queryString);
 
-    const fetchUrl = `http://127.0.0.1:5000/api/grades?${queryString}`;
+    const fetchUrl = `http://18.119.131.51:5000/api/grades?${queryString}`;
     //console.log('Fetching URL for grades:', fetchUrl);
 
     fetch(fetchUrl)
