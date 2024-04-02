@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from sqlalchemy import create_engine, func, Float, desc
 from sqlalchemy.orm import sessionmaker
 from models import Base, GradeData # Ensure this matches your actual import
@@ -13,6 +13,10 @@ DATABASE_URI = 'sqlite:///university_grades.db'
 engine = create_engine(DATABASE_URI)
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
+
+@app.route('/')
+def index():
+    return send_from_directory('static', 'index.html')
 
 @app.route('/api/grades', methods=['GET'])
 def get_grades():
