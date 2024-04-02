@@ -9,7 +9,7 @@
 header {
     background-color: #0D1B2A; /* Dark background for the header */
     color: #E0E1DD; /* White text color */
-    padding: 10px 20px; /* Some padding around the header */
+    padding: env(safe-area-inset-top) 20px 10px; /* Adjust top padding to respect safe areas */
     width: 100%; /* Ensures the header stretches across the full viewport width */
     position: fixed; /* Fixes the position relative to the viewport */
     top: 0; /* Positions the header at the top of the viewport */
