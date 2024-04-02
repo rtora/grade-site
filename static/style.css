@@ -165,6 +165,7 @@ input[type="text"]:focus {
     margin-right: auto;
     color: #282828;
     border-radius: 0 0 12px 12px;
+    max-width: 500px;
 
 }
 
