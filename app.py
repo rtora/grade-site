@@ -5,7 +5,7 @@ from models import Base, GradeData # Ensure this matches your actual import
 from flask_cors import CORS
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 CORS(app)  # Enable CORS for all routes
 
 # Adjust the DATABASE_URI as needed
