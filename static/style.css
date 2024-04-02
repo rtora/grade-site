@@ -5,11 +5,22 @@
     box-sizing: border-box;
 }
 
+:root {
+    --safe-area-inset-top: env(safe-area-inset-top, 0px);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-inset-left: env(safe-area-inset-left, 0px);
+    --safe-area-inset-right: env(safe-area-inset-right, 0px);
+}
+
+
 /* Styles the <header> element */
 header {
     background-color: #0D1B2A; /* Dark background for the header */
     color: #E0E1DD; /* White text color */
-    padding: env(safe-area-inset-top) 20px 10px; /* Adjust top padding to respect safe areas */
+    padding-top: calc(10px + var(--safe-area-inset-top)); /* Add safe area inset to top padding */
+    padding-bottom: 10px; /* Bottom padding */
+    padding-left: calc(20px + var(--safe-area-inset-left)); /* Adjust left padding for safe area */
+    padding-right: calc(20px + var(--safe-area-inset-right)); /* Adjust right padding for safe area */
     width: 100%; /* Ensures the header stretches across the full viewport width */
     position: fixed; /* Fixes the position relative to the viewport */
     top: 0; /* Positions the header at the top of the viewport */
