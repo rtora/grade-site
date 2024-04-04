@@ -12,6 +12,32 @@ function debounce(func, wait) {
     };
 }
 
+// Example UC Synonyms dictionary
+const unisynonyms = {
+    "Cal Poly Pomona": ['California State Polytechnic University, Pomona', 'California State Polytechnic University Pomona', 'CPP'],
+    "Cal State LA": ["California State University, Los Angeles", "California State University Los Angeles", "Cal State L.A.", "Cal State Los Angeles"],
+    "Chico State": ["California State University, Chico", "California State University Chico","CSUC", "CSU Chico","Cal State Chico","Chico University","Chico State University"],
+    "CSU Channel Islands": ["California State University, Channel Islands", "California State University Channel Islands", "CSUCI"],
+    "Cal State East Bay": ["Pioneers", "California State University, East Bay", "California State University East Bay", "CSUEB", "CSU East Bay"],
+    "CSU Nothridge": ["Matadors", "CSUN", "California State University Northridge", "California State University, Northridge", "Cal State Northridge"],
+    "Sacramento State": ["Sac State", "California State University, Sacramento", "California State University Sacramento"],
+    "CSU San Bernardino": ["California State University, San Bernardino", "California State University San Bernardino", "CSUSB", "Cal State San Bernardino"],
+    "CSU San Marcos": ["California State University, San Marcos", "California State University San Marcos", "CSUSM", "Cal State San Marcos"],
+    "Stanislaus State": ["Stan State", "California State University Stanislaus", "California State University, Stanislaus", "Stanislaus State University", "Stan State University", "University of Stanislaus State", "CSU Stanislaus", "Cal State Stanislaus"],
+    "Cal Poly Humboldt": ["California State Polytechnic University, Humboldt", "California State Polytechnic University Humboldt", "Humboldt", "CPH"],
+    "San Francisco State": ["SFSU", "San Francisco State University", "SF State"],
+    "San Jose State": ["SJSU", "Spartans", "San Jose State University"],
+    "UCLA": ["University of California, Los Angeles", "Bruins", "Westwood","UC Los Angeles", "University of California Los Angeles"],
+    "UC Berkeley": ["University of California, Berkeley", "Cal", "Berkeley", "UCB", "University of California Berkeley"],
+    "UC Davis": ["University of California, Davis", "Aggies", "UCD", "University of California Davis"],
+    "UC Irvine": ["University of California, Irvine", "University of California Irvine", "Anteaters", "Zot", "UCI"],
+    "UC Merced": ["UCM", "University of California, Merced", "University of California Merced", "Bobcats"],
+    "UC Santa Barbara": ["UCSB", "University of California, Santa Barbara", "University of California Santa Barbara", "Gauchos"],
+    "UC Santa Cruz": ["UCSC", "	University of California, Santa Cruz", "	University of California Santa Cruz", "Banana Slugs"],
+    "UC San Diego": ["UCSD", "University of California, San Diego", "University of California San Diego"]
+    // Continue for all UCs...
+  };
+  
 
 document.addEventListener('DOMContentLoaded', () => {
     const filterIds = ['instructor', 'year', 'catalog_number', 'subject', 'term', 'university', 'title'];
@@ -32,12 +58,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+function standardizeUniversityValue(inputElement) {
+    if (inputElement && inputElement.id === 'university') {
+        let inputValue = inputElement.value.trim().toLowerCase();
+        for (let key in unisynonyms) {
+            let synonyms = unisynonyms[key].map(name => name.toLowerCase());
+            if (synonyms.includes(inputValue)) {
+                inputElement.value = key; // Assign the standardized key
+                break; // Exit once a match is found
+            }
+        }
+    }
+}
+
 function autocomplete(inputElement, filterField) {
     //console.log(`Autocomplete triggered for: ${filterField}`);
     displaySearchingMessage(inputElement);
+    standardizeUniversityValue(inputElement);
 
     // Get all filter values except the current one being typed into
     const filters = getFilters();
+
     //console.log('Current filters:', filters);
 
     // Construct the query string with all filters except the current one
@@ -48,6 +89,8 @@ function autocomplete(inputElement, filterField) {
     //console.log('Constructed query string:', queryString);
 
     // Prepare the current field and its value for the URL
+    // console.log('Search Value:',inputElement.value, 'Type: ',inputElement.type);
+    // console.log('Search Term:', inputElement.id);
     const currentFieldQuery = `autocomplete_field=${encodeURIComponent(filterField)}&search=${encodeURIComponent(inputElement.value.trim())}`;
 
     // Combine the current field query with the rest of the filters
@@ -55,6 +98,7 @@ function autocomplete(inputElement, filterField) {
     //console.log('Combined query string:', combinedQueryString);
 
     const fetchUrl = `http://18.119.131.51/autocomplete?${combinedQueryString}`;
+    // const fetchUrl = `http://localhost:5000/autocomplete?${combinedQueryString}`;
     //console.log('Fetching URL:', fetchUrl);
 
     fetch(fetchUrl)
@@ -65,7 +109,7 @@ function autocomplete(inputElement, filterField) {
             return response.json();
         })
         .then(data => {
-            console.log(filterField);
+            //console.log(filterField);
             if (filterField === 'year'){
                 data.sort((a,b)=>b - a)
             }
@@ -76,6 +120,7 @@ function autocomplete(inputElement, filterField) {
             //console.error('Error:', error);
         });
 }
+
 
 
 // Utility function to get all filter values, with added console logging
@@ -91,7 +136,6 @@ function getFilters() {
     });
     return filters;
 }
-
 // displaySuggestions and clearSuggestions remain unchanged from the previous explanation.
 let hideSuggestionTimeout; // Declare a global variable for the hide timeout
 

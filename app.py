@@ -4,7 +4,6 @@ from sqlalchemy.orm import sessionmaker
 from models import Base, GradeData # Ensure this matches your actual import
 from flask_cors import CORS
 
-
 app = Flask(__name__, static_url_path='/static')
 CORS(app)  # Enable CORS for all routes
 
@@ -77,8 +76,7 @@ def autocomplete():
     # Remove the autocomplete_field from the filters since it's not a filter but the target for autocomplete
     selected_filters.pop('autocomplete_field', None)
     search_text = selected_filters.pop('search', '')
-
-    if not autocomplete_field or autocomplete_field not in GradeData.__table__.columns:
+    if not autocomplete_field or autocomplete_field not in GradeData.__table__.columns and autocomplete_field != 'catalog_number':
         session.close()
         return jsonify([])  # Invalid field for autocomplete
 

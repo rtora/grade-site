@@ -196,13 +196,13 @@ input[type="text"]:focus {
 
 #gradesChart {
     margin-top: 20px; /* Space above the chart */
-    max-width: 800px; /* Ensure the chart doesn't stretch beyond this width */
+    /*max-width: 800px; /* Ensure the chart doesn't stretch beyond this width */
     width: 100%; /* Responsive width */
     height: auto; /* Maintain aspect ratio */
 }
 
 #results {
-    max-width: 800px;
+    /*max-width: 800px;*/
     width: 100%; /* Match the filters' width for consistency */
     margin-top: 20px; /* Space above the results */
 }
