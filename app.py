@@ -27,7 +27,8 @@ def get_grades():
     # Apply dynamic filters based on request arguments
     for filter_field, filter_value in request.args.items():
         if hasattr(GradeData, filter_field):
-            query = query.filter(getattr(GradeData, filter_field) == filter_value)
+            column = getattr(GradeData, filter_field)
+            query = query.filter(func.lower(column) == filter_value.lower())
 
     # Specify columns to sum
     columns_to_sum = [
@@ -86,12 +87,13 @@ def autocomplete():
     # Applying selected filters dynamically
     for filter_field, filter_value in selected_filters.items():
         if hasattr(GradeData, filter_field):
-            query = query.filter(getattr(GradeData, filter_field) == filter_value)
+            column = getattr(GradeData, filter_field)
+            query = query.filter(func.lower(column) == filter_value.lower())
 
     # Apply the search text if provided
     if search_text:
-        query = query.filter(getattr(GradeData, autocomplete_field).ilike(f"%{search_text}%"))
-    if autocomplete_field == 'year':
+        query = query.filter(func.lower(getattr(GradeData, autocomplete_field)).ilike(f"%{search_text.lower()}%"))
+    if autocomplete_field == 'year' or autocomplete_field == 'catalog_number':
         query = query.order_by(desc(getattr(GradeData, autocomplete_field)))
 
     # Limiting results and ensuring they are not None
