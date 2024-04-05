@@ -93,7 +93,7 @@ def autocomplete():
     # Apply the search text if provided
     if search_text:
         query = query.filter(func.lower(getattr(GradeData, autocomplete_field)).ilike(f"%{search_text.lower()}%"))
-    if autocomplete_field == 'year' or autocomplete_field == 'catalog_number':
+    if autocomplete_field == 'year':
         query = query.order_by(desc(getattr(GradeData, autocomplete_field)))
 
     # Limiting results and ensuring they are not None
