@@ -10,3 +10,11 @@ p{
 #Title{
     margin-top: 0;
 }
+#contact a {
+    text-decoration: none; /* Removes the underline from links */
+    color: #E0E1DD; /* White text color for the links */
+    transition: color 0.3s; /* Smooth transition for link color change */
+}
+#contact a:hover {
+    color: #5551ff; /* Changes the link color on hover */
+}
