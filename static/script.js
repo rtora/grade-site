@@ -2,7 +2,7 @@ function debounce(func, wait) {
     let timeout;
 
     return function executedFunction(...args) {
-        const later = () => {
+        var later = () => {
             clearTimeout(timeout);
             func(...args);
         };
@@ -13,7 +13,7 @@ function debounce(func, wait) {
 }
 
 // Example UC Synonyms dictionary
-const unisynonyms = {
+var unisynonyms = {
     "Cal Poly Pomona": ['California State Polytechnic University, Pomona', 'California State Polytechnic University Pomona', 'CPP'],
     "Cal State LA": ["California State University, Los Angeles", "California State University Los Angeles", "Cal State L.A.", "Cal State Los Angeles"],
     "Chico State": ["California State University, Chico", "California State University Chico","CSUC", "CSU Chico","Cal State Chico","Chico University","Chico State University"],
@@ -40,19 +40,19 @@ const unisynonyms = {
   
 
 document.addEventListener('DOMContentLoaded', () => {
-    const filterIds = ['instructor', 'year', 'catalog_number', 'subject', 'term', 'university', 'title'];
+    var filterIds = ['instructor', 'year', 'catalog_number', 'subject', 'term', 'university', 'title'];
 
     filterIds.forEach((filterId) => {
-        const inputElement = document.getElementById(filterId); // This line was missing in the provided code snippet.
+        var inputElement = document.getElementById(filterId); // This line was missing in the provided code snippet.
         if (inputElement) {
-            const debouncedAutocomplete = debounce(() => autocomplete(inputElement, filterId), 500);
+            var debouncedAutocomplete = debounce(() => autocomplete(inputElement, filterId), 500);
             inputElement.addEventListener('input', debouncedAutocomplete); // Use debounced function here.
             inputElement.addEventListener('blur', () => {
                 hideSuggestionTimeout = setTimeout(() => clearSuggestions(inputElement), 200); // Use a timeout to delay hiding
             });
         }
     });
-    const submitButton = document.getElementById('submit');
+    var submitButton = document.getElementById('submit');
     if (submitButton) {
         submitButton.addEventListener('click', fetchGrades);
     }
@@ -77,28 +77,28 @@ function autocomplete(inputElement, filterField) {
     standardizeUniversityValue(inputElement);
 
     // Get all filter values except the current one being typed into
-    const filters = getFilters();
+    var filters = getFilters();
 
     //console.log('Current filters:', filters);
 
-    // Construct the query string with all filters except the current one
-    const queryString = Object.keys(filters)
+    // varruct the query string with all filters except the current one
+    var queryString = Object.keys(filters)
         .filter(key => filters[key] && key !== filterField) // Keep only non-empty values and exclude current field
         .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(filters[key])}`)
         .join('&');
-    //console.log('Constructed query string:', queryString);
+    //console.log('varructed query string:', queryString);
 
     // Prepare the current field and its value for the URL
     // console.log('Search Value:',inputElement.value, 'Type: ',inputElement.type);
     // console.log('Search Term:', inputElement.id);
-    const currentFieldQuery = `autocomplete_field=${encodeURIComponent(filterField)}&search=${encodeURIComponent(inputElement.value.trim())}`;
+    var currentFieldQuery = `autocomplete_field=${encodeURIComponent(filterField)}&search=${encodeURIComponent(inputElement.value.trim())}`;
 
     // Combine the current field query with the rest of the filters
-    const combinedQueryString = queryString.length > 0 ? `${currentFieldQuery}&${queryString}` : currentFieldQuery;
+    var combinedQueryString = queryString.length > 0 ? `${currentFieldQuery}&${queryString}` : currentFieldQuery;
     //console.log('Combined query string:', combinedQueryString);
 
-    const fetchUrl = `https://collegegrades.org/autocomplete?${combinedQueryString}`;
-    // const fetchUrl = `http://localhost:5000/autocomplete?${combinedQueryString}`;
+    var fetchUrl = `https://collegegrades.org/autocomplete?${combinedQueryString}`;
+    // var fetchUrl = `http://localhost:5000/autocomplete?${combinedQueryString}`;
     //console.log('Fetching URL:', fetchUrl);
 
     fetch(fetchUrl)
@@ -125,10 +125,10 @@ function autocomplete(inputElement, filterField) {
 
 // Utility function to get all filter values, with added console logging
 function getFilters() {
-    const filterIds = ['instructor', 'year', 'catalog_number', 'subject', 'term', 'university', 'title'];
+    var filterIds = ['instructor', 'year', 'catalog_number', 'subject', 'term', 'university', 'title'];
     let filters = {};
     filterIds.forEach(filterId => {
-        const inputElement = document.getElementById(filterId);
+        var inputElement = document.getElementById(filterId);
         if (inputElement && inputElement.value.trim()) {
             filters[filterId] = inputElement.value.trim();
             //console.log(`Filter [${filterId}] has value:`, inputElement.value.trim());
@@ -179,18 +179,18 @@ function clearSuggestions(inputElement) {
 }
 
 function fetchGrades() {
-    const filters = getFilters();
-    const university = document.getElementById('university').value; // Capture the selected university
+    var filters = getFilters();
+    var university = document.getElementById('university').value; // Capture the selected university
     //console.log('Fetching grades with filters:', filters);
 
-    // Construct the query string with all filters
-    const queryString = Object.keys(filters)
+    // varruct the query string with all filters
+    var queryString = Object.keys(filters)
         .filter(key => filters[key]) // Keep only non-empty values
         .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(filters[key])}`)
         .join('&');
-    //console.log('Constructed query string for grades:', queryString);
+    //console.log('varructed query string for grades:', queryString);
 
-    const fetchUrl = `https://collegegrades.org/api/grades?${queryString}`;
+    var fetchUrl = `https://collegegrades.org/api/grades?${queryString}`;
     //console.log('Fetching URL for grades:', fetchUrl);
 
     fetch(fetchUrl)
@@ -211,13 +211,13 @@ function fetchGrades() {
 
 function displayGradesResults(data) {
     // Example implementation: Displaying data as JSON in a preformatted text element
-    const resultsContainer = document.getElementById('results');
+    var resultsContainer = document.getElementById('results');
     if (resultsContainer) {
         // Clear previous results
         resultsContainer.innerHTML = '';
 
         // Create a preformatted text element to display JSON data
-        const pre = document.createElement('pre');
+        var pre = document.createElement('pre');
         pre.textContent = JSON.stringify(data, null, 2);
 
         resultsContainer.appendChild(pre);
@@ -231,7 +231,7 @@ function calculateAverageGPA(data, useProvidedGPA = false) {
         return data['average_GPA']; // Use the provided GPA
     }
     
-    const gradePoints = {
+    var gradePoints = {
         'A_plus': 4.0, 'A': 4.0, 'A_minus': 3.7,
         'B_plus': 3.3, 'B': 3.0, 'B_minus': 2.7,
         'C_plus': 2.3, 'C': 2.0, 'C_minus': 1.7,
@@ -243,7 +243,7 @@ function calculateAverageGPA(data, useProvidedGPA = false) {
     let totalGrades = 0;
     
     Object.keys(gradePoints).forEach(grade => {
-        const count = data[grade] || 0;
+        var count = data[grade] || 0;
         totalPoints += count * gradePoints[grade];
         totalGrades += count;
     });
@@ -259,9 +259,9 @@ function displayGradesResults(data, university) {
     // Determine whether to use the provided GPA or calculate it
     //console.log('Received data:', data); // Check the entire data structure
     //console.log('University:', university); // Specifically check the university value
-    const useProvidedGPA = university === 'UC San Diego';
+    var useProvidedGPA = university === 'UC San Diego';
     //console.log('Using provided GPA?', useProvidedGPA);
-    const averageGPA = calculateAverageGPA(data, useProvidedGPA);
+    var averageGPA = calculateAverageGPA(data, useProvidedGPA);
 
     // Attempt to find an existing GPA display element
     let gpaDisplay = document.getElementById('averageGPA');
@@ -271,14 +271,14 @@ function displayGradesResults(data, university) {
         gpaDisplay = document.createElement('p');
         gpaDisplay.id = 'averageGPA';
         // Find the container where the chart is located or another appropriate location in your HTML structure
-        const chartContainer = document.getElementById('gradesChart').parentNode;
+        var chartContainer = document.getElementById('gradesChart').parentNode;
         chartContainer.insertBefore(gpaDisplay, document.getElementById('gradesChart'));
     }
 
     // Update the GPA display text
     gpaDisplay.textContent = `Average GPA: ${averageGPA.toFixed(2)}`;
 
-    const ctx = document.getElementById('gradesChart').getContext('2d');
+    var ctx = document.getElementById('gradesChart').getContext('2d');
 
     // Destroy existing chart instance if present
     if (gradesChartInstance) {
@@ -368,7 +368,7 @@ function displayGradesResults(data, university) {
     });
     
     // Displaying the JSON data underneath the chart
-    const resultsContainer = document.getElementById('results');
+    var resultsContainer = document.getElementById('results');
     if (!resultsContainer) {
         //console.error('Results container not found');
         return;
@@ -398,14 +398,14 @@ function displayGradesResults(data, university) {
     // Your chart creation code remains unchanged...
 
     // Filter and prepare the data for display excluding 'average_gpa'
-    const filteredData = Object.entries(data)
+    var filteredData = Object.entries(data)
         .filter(([key, value]) => {
             // Ensure the key is in the list of relevant grades and the value is greater than 0, excluding 'average_gpa'
             return key !== 'average_GPA' && (relevantGrades.includes(key) || value > 0);
         })
         .reduce((acc, [key, value]) => {
             // Convert internal grade identifiers to a more friendly format
-            const simplifiedKey = key.replace(/_plus/g, '+').replace(/_minus/g, '-').replace(/_/g, ' ');
+            var simplifiedKey = key.replace(/_plus/g, '+').replace(/_minus/g, '-').replace(/_/g, ' ');
             if(typeof value == 'number'){
                 acc[simplifiedKey] = truncateToTwoDecimals(value);
             }else{
@@ -415,40 +415,40 @@ function displayGradesResults(data, university) {
     }, {});
 
     // Define the desired order of grades
-    const gradeOrder = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'];
+    var gradeOrder = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'];
 
     // Convert the gradeOrder to a mapping for easier comparison
-    const gradeOrderMap = gradeOrder.reduce((acc, grade, index) => {
+    var gradeOrderMap = gradeOrder.reduce((acc, grade, index) => {
         acc[grade] = index;
         return acc;
     }, {});
 
     // Sort the keys of filteredData based on the custom grade order
-    const sortedDataKeys = Object.keys(filteredData).sort((a, b) => {
+    var sortedDataKeys = Object.keys(filteredData).sort((a, b) => {
         // Use the gradeOrderMap to get the order index
-        const orderA = gradeOrderMap[a] !== undefined ? gradeOrderMap[a] : gradeOrder.length;
-        const orderB = gradeOrderMap[b] !== undefined ? gradeOrderMap[b] : gradeOrder.length;
+        var orderA = gradeOrderMap[a] !== undefined ? gradeOrderMap[a] : gradeOrder.length;
+        var orderB = gradeOrderMap[b] !== undefined ? gradeOrderMap[b] : gradeOrder.length;
         return orderA - orderB;
     });
 
-    // Use the sorted keys to construct the sortedData object
-    const sortedData = sortedDataKeys.reduce((acc, key) => {
+    // Use the sorted keys to varruct the sortedData object
+    var sortedData = sortedDataKeys.reduce((acc, key) => {
         acc[key] = filteredData[key];
         return acc;
     }, {});
 
     // Add a title for the section
-    const titleElement = document.createElement('h2');
+    var titleElement = document.createElement('h2');
     titleElement.textContent = 'Grades Given';
     resultsContainer.appendChild(titleElement);
 
-    // Construct a string with the desired format: key: value\n (without curly braces, quotes on keys, and commas)
+    // varruct a string with the desired format: key: value\n (without curly braces, quotes on keys, and commas)
     let formattedString = Object.entries(sortedData).map(([key, value]) => {
         return `${key}: ${value}`;
     }).join('\n');
 
     // Create and append the formatted text to the resultsContainer
-    const pre = document.createElement('pre');
+    var pre = document.createElement('pre');
     pre.textContent = formattedString;
 
     // Append the JSON data underneath the title
