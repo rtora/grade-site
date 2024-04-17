@@ -28,7 +28,7 @@ var unisynonyms = {
     "San Francisco State": ["SFSU", "San Francisco State University", "SF State"],
     "San Jose State": ["SJSU", "Spartans", "San Jose State University"],
     "UCLA": ["University of California, Los Angeles", "Bruins", "Westwood","UC Los Angeles", "University of California Los Angeles"],
-    "UC Berkeley": ["University of California, Berkeley", "Cal", "Berkeley", "UCB", "University of California Berkeley"],
+    "UC Berkeley": ["University of California, Berkeley", "Berkeley", "UCB", "University of California Berkeley"],
     "UC Davis": ["University of California, Davis", "Aggies", "UCD", "University of California Davis"],
     "UC Irvine": ["University of California, Irvine", "University of California Irvine", "Anteaters", "Zot", "UCI"],
     "UC Merced": ["UCM", "University of California, Merced", "University of California Merced", "Bobcats"],
