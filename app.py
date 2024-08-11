@@ -5,11 +5,23 @@ from models import Base, GradeData # Ensure this matches your actual import
 from flask_cors import CORS
 
 app = Flask(__name__, static_url_path='/static')
-CORS(app, resources={r"/*": {"origins": [
-    "http://collegegrades.org",
-    "https://collegegrades.org",
-    "http://www.collegegrades.org",
-    "https://www.collegegrades.org"],"allow_headers": ["Content-Type", "Accept", "X-Requested-With"]}})
+
+CORS(app, resources={
+    r"/grades": {
+        "origins": ["https://collegegrades.org", "https://www.collegegrades.org"],
+        "methods": ["GET", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"],
+        "supports_credentials": True,
+        "expose_headers": ["Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"]
+    },
+    r"/grades/": {
+        "origins": ["https://collegegrades.org", "https://www.collegegrades.org"],
+        "methods": ["GET", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"],
+        "supports_credentials": True,
+        "expose_headers": ["Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"]
+    }
+})
 
 # Adjust the DATABASE_URI as needed
 DATABASE_URI = 'sqlite:///university_grades.db'
@@ -21,6 +33,16 @@ DBSession = sessionmaker(bind=engine)
 def index():
     return send_from_directory('static', 'index.html')
 
+@app.after_request
+def after_request(response):
+    origin = request.headers.get('Origin')
+    if origin in ["https://collegegrades.org", "https://www.collegegrades.org"]:
+        response.headers.add('Access-Control-Allow-Origin', origin)
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, OPTIONS')
+    return response
+    
 @app.route('/grades/', defaults={'path': ''})
 @app.route('/grades/<path:path>')
 def get_grades():
