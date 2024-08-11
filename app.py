@@ -9,8 +9,7 @@ CORS(app, resources={r"/*": {"origins": [
     "http://collegegrades.org",
     "https://collegegrades.org",
     "http://www.collegegrades.org",
-    "https://www.collegegrades.org"
-]}})
+    "https://www.collegegrades.org"],"allow_headers": ["Content-Type", "Accept", "X-Requested-With"]}})
 
 # Adjust the DATABASE_URI as needed
 DATABASE_URI = 'sqlite:///university_grades.db'
