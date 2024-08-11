@@ -22,8 +22,8 @@ DBSession = sessionmaker(bind=engine)
 def index():
     return send_from_directory('static', 'index.html')
 
-@app.route('/api/grades/', defaults={'path': ''})
-@app.route('/api/grades/<path:path>')
+@app.route('/grades/', defaults={'path': ''})
+@app.route('/grades/<path:path>')
 def get_grades():
     session = DBSession()
 
@@ -70,7 +70,7 @@ def get_grades():
     return jsonify(sums_dict)
 
 
-@app.route('/autocomplete/', defaults={'path': ''})
+@app.route('/automcomplete/', defaults={'path': ''})
 @app.route('/autocomplete/<path:path>')
 def autocomplete():
     session = DBSession()
