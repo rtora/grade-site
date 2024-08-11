@@ -190,7 +190,7 @@ function fetchGrades() {
         .join('&');
     //console.log('varructed query string for grades:', queryString);
 
-    var fetchUrl = `https://collegegrades.org/api/grades?${queryString}`;
+    var fetchUrl = `https://collegegrades.org/grades?${queryString}`;
     //console.log('Fetching URL for grades:', fetchUrl);
 
     fetch(fetchUrl)
