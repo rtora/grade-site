@@ -5,7 +5,7 @@ from models import Base, GradeData # Ensure this matches your actual import
 from flask_cors import CORS
 
 app = Flask(__name__, static_url_path='/static')
-CORS(app, resources={r"/*": {"origins": ["http://collegegrades.org", "https://collegegrades.org"]}})
+CORS(app, resources={r"/*": {"origins": ["http://collegegrades.org", "https://collegegrades.org", "https://www.collegegrades.org", "http://www.collegegrades.org"]}})
 
 # Adjust the DATABASE_URI as needed
 DATABASE_URI = 'sqlite:///university_grades.db'
@@ -64,7 +64,7 @@ def get_grades():
     return jsonify(sums_dict)
 
 
-@app.route('/autocomplete', methods=['GET'])
+@app.route('/api/autocomplete', methods=['GET'])
 def autocomplete():
     session = DBSession()
 

@@ -97,7 +97,7 @@ function autocomplete(inputElement, filterField) {
     var combinedQueryString = queryString.length > 0 ? `${currentFieldQuery}&${queryString}` : currentFieldQuery;
     //console.log('Combined query string:', combinedQueryString);
 
-    var fetchUrl = `https://collegegrades.org/autocomplete?${combinedQueryString}`;
+    var fetchUrl = `https://collegegrades.org/api/autocomplete?${combinedQueryString}`;
     // var fetchUrl = `http://localhost:5000/autocomplete?${combinedQueryString}`;
     //console.log('Fetching URL:', fetchUrl);
 
