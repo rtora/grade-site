@@ -101,31 +101,24 @@ function autocomplete(inputElement, filterField) {
     // var fetchUrl = `http://localhost:5000/autocomplete?${combinedQueryString}`;
     //console.log('Fetching URL:', fetchUrl);
 
-    fetch(fetchUrl, {
-        method: 'GET',
-        credentials: 'include', // This line is crucial for including credentials
-        headers: {
-            'Content-Type': 'application/json',
-            // Add any other necessary headers here
-        }
-    })  
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        //console.log(filterField);
-        if (filterField === 'year'){
-            data.sort((a,b)=>b - a)
-        }
-        //console.log('Data received from autocomplete:', data);
-        displaySuggestions(data, inputElement, filterField);
-    })
-    .catch(error => {
-        //console.error('Error:', error);
-    });
+    fetch(fetchUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            //console.log(filterField);
+            if (filterField === 'year'){
+                data.sort((a,b)=>b - a)
+            }
+            //console.log('Data received from autocomplete:', data);
+            displaySuggestions(data, inputElement, filterField);
+        })
+        .catch(error => {
+            //console.error('Error:', error);
+        });
 }
 
 
@@ -197,30 +190,23 @@ function fetchGrades() {
         .join('&');
     //console.log('varructed query string for grades:', queryString);
 
-    var fetchUrl = `https://collegegrades.org/grades?${queryString}`;
+    var fetchUrl = `https://collegegrades.org/api/grades?${queryString}`;
     //console.log('Fetching URL for grades:', fetchUrl);
 
-    fetch(fetchUrl, {
-        method: 'GET',
-        credentials: 'include', // This line is crucial for including credentials
-        headers: {
-            'Content-Type': 'application/json',
-            // Add any other necessary headers here
-        }
-    })        
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        //console.log('Data received from /api/grades:', data);
-        displayGradesResults(data, university); // You need to define this
-    })
-    .catch(error => {
-        //console.error('Error fetching grades:', error);
-    });
+    fetch(fetchUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            //console.log('Data received from /api/grades:', data);
+            displayGradesResults(data, university); // You need to define this
+        })
+        .catch(error => {
+            //console.error('Error fetching grades:', error);
+        });
 }
 
 function displayGradesResults(data) {
