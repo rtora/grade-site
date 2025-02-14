@@ -1,20 +1,272 @@
-h2{
-    margin: 10px 10px  0 0;
+/* Style inline contact link differently from the contact button */
+p a {
+    color: var(--accent);
+    text-decoration: underline;
+    font-weight: 500;
+    transition: all 0.3s;
 }
-h1{
-    margin: 20px 20px 0 0;
+
+p a:hover {
+    color: var(--accent-hover);
+    text-decoration: none;
+}#about {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
 }
-p{
-    margin: 5px 5px 0 0;
+
+.research-notice {
+    background-color: var(--accent);
+    margin: 1rem 0;
+    text-align: center;
+    padding: 1rem !important;
 }
-#Title{
+
+.research-text {
+    color: white !important;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin: 0 !important;
+}
+
+section {
+    background-color: var(--card-bg);
+    border-radius: 1rem;
+    padding: 2rem;
+    margin: 2rem 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+section h2:first-child {
     margin-top: 0;
 }
-#contact a {
-    text-decoration: none; /* Removes the underline from links */
-    color: #E0E1DD; /* White text color for the links */
-    transition: color 0.3s; /* Smooth transition for link color change */
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+    text-align: center;
 }
-#contact a:hover {
-    color: #5551ff; /* Changes the link color on hover */
+
+h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 2rem 0 1rem;
+    color: var(--text-color);
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 0.5rem;
+    display: inline-block;
+}
+
+h3 {
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin: 1.5rem 0 1rem;
+    color: var(--text-color);
+}
+
+h4 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 1.5rem 0 1rem;
+    color: var(--text-color);
+}
+
+p {
+    margin: 1rem 0;
+    line-height: 1.8;
+    color: var(--text-color);
+    font-size: 1.05rem;
+}
+
+#uni {
+    list-style-type: none;
+    padding: 0;
+    margin: 1.5rem 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+#uni li {
+    padding: 0.75rem 1rem;
+    background-color: var(--bg-color);
+    border-radius: 0.5rem;
+    color: var(--text-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+#uni li:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Style for schools with no response or payment required */
+#uni li:has(:contains("$")), 
+#uni li:has(:contains("No response")), 
+#uni li:has(:contains("Does not keep records")) {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+}
+
+#contact {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.contact-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.contact-button {
+    text-decoration: none;
+    color: var(--accent);
+    transition: all 0.3s;
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    border: 2px solid var(--accent);
+    font-weight: 500;
+    font-size: 1.1rem;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.contact-button:hover {
+    background-color: var(--accent);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+}
+
+.email-text {
+    font-size: 1.1rem;
+    color: var(--text-color);
+    margin: 0;
+    opacity: 0.9;
+}
+
+/* Site description highlight */
+section:first-of-type {
+    background-color: var(--accent);
+    color: white;
+}
+
+section:first-of-type h2,
+section:first-of-type p {
+    color: white;
+}
+
+section:first-of-type h2 {
+    border-bottom-color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #uni {
+        grid-template-columns: 1fr;
+    }
+    
+    section {
+        padding: 1.5rem;
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+}
+
+.nav-container {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+}
+
+/* Mobile menu button styles */
+.mobile-menu-button {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 10;
+}
+
+.mobile-menu-button span {
+    width: 100%;
+    height: 3px;
+    background-color: var(--text-color);
+    transition: all 0.3s ease-in-out;
+    border-radius: 1.5px;
+}
+
+.mobile-menu-button span.active:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+}
+
+.mobile-menu-button span.active:nth-child(2) {
+    opacity: 0;
+}
+
+.mobile-menu-button span.active:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    .mobile-menu-button {
+        display: flex;
+    }
+
+    .nav-container {
+        gap: 1rem;
+    }
+
+    .nav-links {
+        position: fixed;
+        top: var(--header-height);
+        left: 0;
+        right: 0;
+        background-color: var(--card-bg);
+        padding: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease-in-out;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .nav-links.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .theme-label {
+        display: none;
+    }
+
+    .theme-toggle {
+        padding: 0.5rem;
+    }
 }

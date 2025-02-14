@@ -1,89 +1,124 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>College Grades</title>
-    <link rel="stylesheet" href="/static/style.css"> <!-- If you have custom styles -->
-    <link rel="stylesheet" href="/static/about.css"> <!-- If you have custom styles -->
+    <title>College Grades - About</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/about.css">
     <link rel="icon" href="/static/favicon.ico">
 </head>
 <body>
     <header>
-        <nav>
-            <ul>
-                <li><a href="/static/">Home/Reset</a></li>
-                <li><a href="/static/about.html">About</a></li>
-            </ul>
-        </nav>
+        <div class="header-content">
+            <a href="/static/" class="logo">College Grades</a>
+            <nav>
+                <div class="nav-container">
+                    <ul class="nav-links">
+                        <li><a href="/static/about.html">About</a></li>
+                    </ul>
+                    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                        <span class="theme-label">Dark Mode</span>
+                        <div class="toggle-slider">
+                            <div class="toggle-icon">🌙</div>
+                        </div>
+                    </button>
+                </div>
+            </nav>
+        </div>
     </header>
+
     <main>
-        <div id = "about">
-            <h1 id ="Title">College Grades</h1>
-            <h2>This site is for research purposes only</h2>
-            <h2>Project Overview</h2>
-            <p>This website contains grades data from various University of California (UC) and California State University (CSU) campuses. The data encompasses academic records from the years 2000 to 2023.</p>
-            <h2>How to Use this Site</h2>
-            <p>You can select as many or as few of the filters as you like. Suggestions will appear beneath your filter box, and you can click on a suggestion to autofill it. Once you are done, click the submit button.</p>
-            <p>Note: Not all filters work with every school. College, Year, Quarter/Semester, Subject, and Catalog Number should work for all schools. Also, filters search based on an exact match, so it is recommended to use the autocomplete suggestions. UC San Diego's grades are given as a percentage of the class that received the grade.</p>
-            <h2>Colleges with Data</h2>
-            <ul id = "uni">
-                <li>Cal Poly Pomona</li>
-                <li>Cal State LA</li>
-                <li>Chico State</li>
-                <li>CSU Channel Islands</li>
-                <li>Cal State East Bay</li>
-                <li>CSU Northridge</li>
-                <li>Sacramento State</li>
-                <li>CSU San Bernardino</li>
-                <li>CSU San Marcos</li>
-                <li>Stanislaus State</li>
-                <li>Cal Poly Humboldt</li>
-                <li>San Francisco State</li>
-                <li>San Jose State</li>
-                <li>UC Berkeley</li>
-                <li>UC Davis</li>
-                <li>UC Irvine</li>
-                <li>UCLA</li>
-                <li>UC Merced</li>
-                <li>UC Santa Barbara</li>
-                <li>UC Santa Cruz</li>
-                <li>UC San Diego</li>
-            </ul>
+        <div id="about">
+            <h1>College Grades</h1>
             
-            <h2>Data Updates</h2>
-            <h3>How often will the data be updated?</h3>
-            <p>The data will be updated annually at the beginning of each year.</p>
+            <section class="research-notice">
+                <p class="research-text">This site is for research purposes only</p>
+            </section>
 
-            <h2>Missing Data</h2>
-            <h3>Why isn't data from my school included?</h3>
-            <p>Requests were made for data from every UC and CSU. However, some institutions did not respond, while others requested payment, which was not feasible due to budget constraints. If you wish to fund data acquisition from your college, please <a href="mailto:admin@collegegrades.org">contact me</a>. Below is a list of schools from which data was not obtained, including reasons and requested payments:</p>
+            <section>
+                <h2>Project Overview</h2>
+                <p>This website contains grades data from various University of California (UC) and California State University (CSU) campuses. The data encompasses academic records from the years 2000 to 2023.</p>
+            </section>
 
-            <ul id = "uni">
-                <li>UC Riverside: No response</li>
-                <li>UCSF: Does not keep records</li>
-                <li>CSU Bakersfield: $2000</li>
-                <li>CSU Dominguez Hills: No response</li>
-                <li>Fresno State: $2,000</li>
-                <li>CSU Fullerton: $15,000</li>
-                <li>CSU Long Beach: $1,500</li>
-                <li>Cal Maritime: No response</li>
-                <li>CSU Monterey Bay: $200</li>
-                <li>San Diego State: $5,000</li>
-                <li>Cal Poly San Luis Obispo: $5,000</li>
-                <li>Sonoma State: $900</li>
-                <li>Stanislaus State: No response</li>
-            </ul>
-            <h4>2023 grades</h4>
-            <ul id = "uni">
-                <li>UC Merced: $400</li>
-                <li>UCSC: $300</li>
-                <li>CSUMB: $100</li>
-                <li>SFSU: $350</li>
-                <li>UCLA: $150</li>
-            </ul>
-            <h2 id = "contact"><a href="mailto:admin@collegegrades.org">Contact Me</a></h2>
+            <section>
+                <h2>How to Use this Site</h2>
+                <p>You can select as many or as few of the filters as you like. Suggestions will appear beneath your filter box, and you can click on a suggestion to autofill it. Once you are done, click the submit button.</p>
+                <p>Note: Not all filters work with every school. College, Year, Quarter/Semester, Subject, and Catalog Number should work for all schools. Also, filters search based on an exact match, so it is recommended to use the autocomplete suggestions. UC San Diego's grades are given as a percentage of the class that received the grade.</p>
+            </section>
+
+            <section>
+                <h2>Colleges with Data</h2>
+                <ul id="uni">
+                    <li>Cal Poly Pomona</li>
+                    <li>Cal State LA</li>
+                    <li>Chico State</li>
+                    <li>CSU Channel Islands</li>
+                    <li>Cal State East Bay</li>
+                    <li>CSU Northridge</li>
+                    <li>Sacramento State</li>
+                    <li>CSU San Bernardino</li>
+                    <li>CSU San Marcos</li>
+                    <li>Stanislaus State</li>
+                    <li>Cal Poly Humboldt</li>
+                    <li>San Francisco State</li>
+                    <li>San Jose State</li>
+                    <li>UC Berkeley</li>
+                    <li>UC Davis</li>
+                    <li>UC Irvine</li>
+                    <li>UCLA</li>
+                    <li>UC Merced</li>
+                    <li>UC Santa Barbara</li>
+                    <li>UC Santa Cruz</li>
+                    <li>UC San Diego</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Data Updates</h2>
+                <h3>How often will the data be updated?</h3>
+                <p>The data will be updated annually at the beginning of each year.</p>
+            </section>
+
+            <section>
+                <h2>Missing Data</h2>
+                <h3>Why isn't data from my school included?</h3>
+                <p>Requests were made for data from every UC and CSU. However, some institutions did not respond, while others requested payment, which was not feasible due to budget constraints. If you wish to fund data acquisition from your college, please <a href="mailto:admin@collegegrades.org">contact me</a>. Below is a list of schools from which data was not obtained, including reasons and requested payments:</p>
+
+                <ul id="uni">
+                    <li>UC Riverside: No response</li>
+                    <li>UCSF: Does not keep records</li>
+                    <li>CSU Bakersfield: $2000</li>
+                    <li>CSU Dominguez Hills: No response</li>
+                    <li>Fresno State: $2,000</li>
+                    <li>CSU Fullerton: $15,000</li>
+                    <li>CSU Long Beach: $1,500</li>
+                    <li>Cal Maritime: No response</li>
+                    <li>CSU Monterey Bay: $200</li>
+                    <li>San Diego State: $5,000</li>
+                    <li>Cal Poly San Luis Obispo: $5,000</li>
+                    <li>Sonoma State: $900</li>
+                    <li>Stanislaus State: No response</li>
+                </ul>
+
+                <h4>2023 grades</h4>
+                <ul id="uni">
+                    <li>UC Merced: $400</li>
+                    <li>UCSC: $300</li>
+                    <li>CSUMB: $100</li>
+                    <li>SFSU: $350</li>
+                    <li>UCLA: $150</li>
+                </ul>
+            </section>
+
+            <section id="contact">
+                <div class="contact-container">
+                    <a href="mailto:admin@collegegrades.org" class="contact-button">Contact Me</a>
+                    <p class="email-text">admin@collegegrades.org</p>
+                </div>
+            </section>
         </div>
     </main>
+    <script src="/static/theme.js"></script>
 </body>
 </html>

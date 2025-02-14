@@ -1,4 +1,4 @@
-#!/mnt/c/users/rtora/documents/startup/grades/grade-site/myenv/bin/python3
+#!/Users/romtin/Documents/CollegeGrades/grade-site/myenv/bin/python3.11
 # -*- coding: utf-8 -*-
 import re
 import sys
