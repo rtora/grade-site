@@ -12,3 +12,4 @@ SQLAlchemy==2.0.28
 typing_extensions==4.12.2
 Werkzeug==3.0.1
 requests==2.31.0
+gdown>=4.7.1

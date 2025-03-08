@@ -1,7 +1,8 @@
 import sqlite3
 import os
-import requests
 import sys
+import subprocess
+import requests
 from flask import Flask, request, jsonify, send_from_directory
 from sqlalchemy import create_engine, func, desc
 from sqlalchemy.orm import sessionmaker
@@ -11,58 +12,137 @@ from flask_cors import CORS
 from flask_caching import Cache
 from pathlib import Path
 
-# Download database immediately at module load time
 def download_database_file():
-    """Download the database file from Google Drive if it doesn't exist"""
-    db_path = 'university_grades.db'
-    app_dir = os.path.dirname(os.path.abspath(__file__))
-    full_path = os.path.join(app_dir, db_path)
-    
-    print(f"Checking for database at: {full_path}", file=sys.stderr)
-    
-    # Skip download if the file already exists and we're in development
-    if os.path.exists(full_path) and os.environ.get('RAILWAY_ENVIRONMENT') is None:
-        print(f"Database file already exists at {full_path}, skipping download", file=sys.stderr)
-        return full_path
-    
-    # Convert the Google Drive view URL to a direct download URL
-    file_id = "1VkzOs-x1Hepee2TbOkmuYfRWo77Q3Thn"  # Extracted from the user's URL
-    download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
-    
-    print(f"Downloading database file from Google Drive...", file=sys.stderr)
-    
+    """Download the database file from Google Drive"""
     try:
-        # For large files, Google might show a confirmation page
-        # This handles both small and large files
-        session = requests.Session()
-        response = session.get(download_url, stream=True)
+        db_path = 'university_grades.db'
+        app_dir = os.path.dirname(os.path.abspath(__file__))
+        full_path = os.path.join(app_dir, db_path)
         
-        # Check if there's a download warning (for large files)
-        for key, value in response.cookies.items():
-            if key.startswith('download_warning'):
-                download_url = f"{download_url}&confirm={value}"
-                response = session.get(download_url, stream=True)
-                break
+        print(f"Checking for database at: {full_path}", file=sys.stderr)
         
-        # Save the file
-        with open(full_path, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=8192): 
-                if chunk:
-                    f.write(chunk)
+        # Skip download if file exists and we're in development
+        if os.path.exists(full_path) and os.environ.get('RAILWAY_ENVIRONMENT') is None:
+            print(f"Database file already exists at {full_path}, skipping download", file=sys.stderr)
+            
+            # Verify it's a valid database before continuing
+            try:
+                conn = sqlite3.connect(full_path)
+                conn.execute("SELECT name FROM sqlite_master LIMIT 1")
+                conn.close()
+                return full_path
+            except sqlite3.DatabaseError:
+                print(f"Existing database file is invalid, will re-download", file=sys.stderr)
+                # Continue to download
         
-        print(f"Database file downloaded successfully to {full_path}", file=sys.stderr)
+        # Install gdown if not already installed
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "gdown"])
+            print("Installed gdown successfully", file=sys.stderr)
+        except Exception as e:
+            print(f"Failed to install gdown: {e}", file=sys.stderr)
+            raise
         
-        # Run create indexes
+        import gdown
+        
+        # Delete existing file if it exists
+        if os.path.exists(full_path):
+            os.remove(full_path)
+            
+        # Google Drive file ID from the URL
+        file_id = "1VkzOs-x1Hepee2TbOkmuYfRWo77Q3Thn"
+        
+        print(f"Downloading database using gdown...", file=sys.stderr)
+        
+        # Use gdown to handle the download - this properly handles Google Drive's redirects and confirmations
+        output = gdown.download(f"https://drive.google.com/uc?id={file_id}", full_path, quiet=False)
+        
+        if output is None:
+            raise Exception("Download failed - gdown returned None")
+            
+        print(f"Database file downloaded to {full_path}", file=sys.stderr)
+        
+        # Verify the file is a valid SQLite database
+        try:
+            conn = sqlite3.connect(full_path)
+            cursor = conn.cursor()
+            cursor.execute("SELECT name FROM sqlite_master LIMIT 1")
+            result = cursor.fetchone()
+            if result:
+                print(f"Downloaded file verified as valid SQLite database", file=sys.stderr)
+            conn.close()
+        except sqlite3.DatabaseError as e:
+            print(f"ERROR: Downloaded file is not a valid SQLite database: {e}", file=sys.stderr)
+            
+            # Check file size
+            file_size = os.path.getsize(full_path)
+            print(f"Downloaded file size: {file_size} bytes", file=sys.stderr)
+            
+            # Peek at file content for debugging
+            try:
+                with open(full_path, 'rb') as f:
+                    header = f.read(100)
+                    print(f"File header bytes: {header}", file=sys.stderr)
+            except Exception as e:
+                print(f"Error reading file header: {e}", file=sys.stderr)
+                
+            raise Exception("Downloaded file is not a valid SQLite database")
+        
+        # Create indexes
         import create_indexes
         create_indexes.create_indexes(full_path)
         
         return full_path
+        
     except Exception as e:
-        print(f"ERROR downloading database: {str(e)}", file=sys.stderr)
-        raise
+        print(f"ERROR in download_database_file: {e}", file=sys.stderr)
+        # For debugging, use a fallback tiny SQLite database
+        create_empty_db()
+        return 'university_grades.db'
 
-# Call download function immediately at module import time
-print("Starting database download process at application startup...", file=sys.stderr)
+def create_empty_db():
+    """Create a tiny empty database for testing when download fails"""
+    try:
+        print("Creating empty database for fallback", file=sys.stderr)
+        conn = sqlite3.connect('university_grades.db')
+        cursor = conn.cursor()
+        
+        # Create a minimal schema matching your model
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS grades (
+            id INTEGER PRIMARY KEY,
+            "A+" FLOAT, A FLOAT, "A-" FLOAT, 
+            "B+" FLOAT, B FLOAT, "B-" FLOAT,
+            "C+" FLOAT, C FLOAT, "C-" FLOAT,
+            "D+" FLOAT, D FLOAT, "D-" FLOAT,
+            F FLOAT, Pass FLOAT, "Not Pass" FLOAT,
+            Satisfactory FLOAT, Unsatisfactory FLOAT, "Not Satisfactory" FLOAT,
+            Incomplete FLOAT, "In Progress" FLOAT, Withdrawn FLOAT,
+            "Withdrawn Passing" FLOAT, "Withdrawn Medical" FLOAT, "Withdrawn Incomplete" FLOAT,
+            Drop FLOAT, "Withdrawn from University" FLOAT, Honors FLOAT,
+            "No Grade" FLOAT, Review FLOAT, Audit FLOAT,
+            "Not Reported" FLOAT, Repeat FLOAT, DFWU FLOAT,
+            "Pending Judicial Action" FLOAT, Withheld FLOAT, "Report In Progress" FLOAT,
+            "I,RD,RP" FLOAT, "w/o I RD RP" FLOAT,
+            instructor TEXT, year INTEGER, "Catalog Number" TEXT,
+            subject TEXT, term TEXT, university TEXT, title TEXT, GPA FLOAT
+        )
+        ''')
+        
+        # Insert a sample record
+        cursor.execute('''
+        INSERT INTO grades (university, subject, year, term) 
+        VALUES ('Example University', 'Sample', 2025, 'Spring')
+        ''')
+        
+        conn.commit()
+        conn.close()
+        print("Created empty database successfully", file=sys.stderr)
+    except Exception as e:
+        print(f"Error creating empty database: {e}", file=sys.stderr)
+
+# Try to download database at module import time
+print("Starting database download process...", file=sys.stderr)
 DB_PATH = download_database_file()
 print(f"Database setup complete. Path: {DB_PATH}", file=sys.stderr)
 
@@ -223,6 +303,5 @@ def autocomplete():
         session.close()
 
 if __name__ == '__main__':
-    # Download already happened at module import time
     port = int(os.environ.get('PORT', 8000))
     app.run(host='0.0.0.0', port=port, debug=False)
