@@ -1,4 +1,6 @@
 import sqlite3
+import os
+import requests
 from flask import Flask, request, jsonify, send_from_directory
 from sqlalchemy import create_engine, func, desc
 from sqlalchemy.orm import sessionmaker
@@ -6,7 +8,7 @@ from sqlalchemy.pool import StaticPool
 from models import Base, GradeData
 from flask_cors import CORS
 from flask_caching import Cache
-import os
+import create_indexes  # Import the create_indexes module
 from pathlib import Path
 
 app = Flask(__name__, static_url_path='/static')
@@ -21,7 +23,6 @@ CORS(app, resources={r"/*": {"origins": [
     # "http://localhost:5500"    # Add this for local development
 ]}})
 
-
 # Configure Flask-Caching with a simple in-memory cache
 cache_config = {
     'CACHE_TYPE': 'SimpleCache',
@@ -30,22 +31,58 @@ cache_config = {
 app.config.from_mapping(cache_config)
 cache = Cache(app)
 
-def get_memory_connection():
-    """Creates an in-memory SQLite connection and loads the database into it"""
-    mem_conn = sqlite3.connect(':memory:', check_same_thread=False)
-    
-    # Look for database in the application directory
+def download_database_file():
+    """Download the database file from Google Drive if it doesn't exist"""
     db_path = 'university_grades.db'
     app_dir = os.path.dirname(os.path.abspath(__file__))
     full_path = os.path.join(app_dir, db_path)
     
-    print(f"Looking for database at: {full_path}")  # Debug log
+    # Skip download if the file already exists and we're in development
+    if os.path.exists(full_path) and os.environ.get('RAILWAY_ENVIRONMENT') is None:
+        print(f"Database file already exists at {full_path}, skipping download")
+        return full_path
     
-    if not os.path.exists(full_path):
-        print(f"WARNING: Database file not found at {full_path}")
-        # You could add fallback behavior here if needed
+    # Convert the Google Drive view URL to a direct download URL
+    file_id = "1VkzOs-x1Hepee2TbOkmuYfRWo77Q3Thn"  # Extracted from the user's URL
+    download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
     
-    disk_conn = sqlite3.connect(full_path)
+    print(f"Downloading database file from Google Drive...")
+    
+    # For large files, Google might show a confirmation page
+    # This handles both small and large files
+    session = requests.Session()
+    response = session.get(download_url, stream=True)
+    
+    # Check if there's a download warning (for large files)
+    for key, value in response.cookies.items():
+        if key.startswith('download_warning'):
+            download_url = f"{download_url}&confirm={value}"
+            response = session.get(download_url, stream=True)
+            break
+    
+    # Save the file
+    with open(full_path, 'wb') as f:
+        for chunk in response.iter_content(chunk_size=8192): 
+            if chunk:
+                f.write(chunk)
+    
+    print(f"Database file downloaded successfully to {full_path}")
+    
+    # Run create indexes using the imported module
+    create_indexes.create_indexes(full_path)
+    
+    return full_path
+
+def get_memory_connection():
+    """Creates an in-memory SQLite connection and loads the database into it"""
+    mem_conn = sqlite3.connect(':memory:', check_same_thread=False)
+    
+    # Download the database file if it doesn't exist
+    db_path = download_database_file()
+    
+    print(f"Loading database from: {db_path}")
+    
+    disk_conn = sqlite3.connect(db_path)
     
     # Copy disk database to memory
     disk_conn.backup(mem_conn)
@@ -57,7 +94,6 @@ def get_memory_connection():
     mem_conn.execute("PRAGMA synchronous = OFF;")
     
     return mem_conn
-
 
 # Create engine with StaticPool to reuse the same connection
 engine = create_engine(
@@ -177,6 +213,6 @@ def autocomplete():
         session.close()
 
 if __name__ == '__main__':
-    # Run create_indexes.py first to ensure indexes exist
+    # Download the database at startup
     port = int(os.environ.get('PORT', 8000))
     app.run(host='0.0.0.0', port=port, debug=False)
