@@ -6,6 +6,8 @@ from sqlalchemy.pool import StaticPool
 from models import Base, GradeData
 from flask_cors import CORS
 from flask_caching import Cache
+import os
+from pathlib import Path
 
 app = Flask(__name__, static_url_path='/static')
 CORS(app, resources={r"/*": {"origins": [
@@ -160,4 +162,5 @@ def autocomplete():
 
 if __name__ == '__main__':
     # Run create_indexes.py first to ensure indexes exist
-    app.run(debug=False)
+    port = int(os.environ.get('PORT', 8000))
+    app.run(host='0.0.0.0', port=port, debug=False)
