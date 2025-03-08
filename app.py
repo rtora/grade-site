@@ -16,9 +16,11 @@ CORS(app, resources={r"/*": {"origins": [
     "https://www.collegegrades.org",
     "http://www.collegegrades.org",
     "https://collegegrades-production.up.railway.app",
+    "http://collegegrades-production.up.railway.app",
     # "http://127.0.0.1:5500",  # Add this for local development
     # "http://localhost:5500"    # Add this for local development
 ]}})
+
 
 # Configure Flask-Caching with a simple in-memory cache
 cache_config = {
@@ -31,18 +33,31 @@ cache = Cache(app)
 def get_memory_connection():
     """Creates an in-memory SQLite connection and loads the database into it"""
     mem_conn = sqlite3.connect(':memory:', check_same_thread=False)
-    disk_conn = sqlite3.connect('university_grades.db')
+    
+    # Look for database in the application directory
+    db_path = 'university_grades.db'
+    app_dir = os.path.dirname(os.path.abspath(__file__))
+    full_path = os.path.join(app_dir, db_path)
+    
+    print(f"Looking for database at: {full_path}")  # Debug log
+    
+    if not os.path.exists(full_path):
+        print(f"WARNING: Database file not found at {full_path}")
+        # You could add fallback behavior here if needed
+    
+    disk_conn = sqlite3.connect(full_path)
     
     # Copy disk database to memory
     disk_conn.backup(mem_conn)
     disk_conn.close()
     
-    # Optimize SQLite settings for read-only operations
-    mem_conn.execute("PRAGMA cache_size = -32000;")  # 32MB cache
+    # Optimize SQLite settings
+    mem_conn.execute("PRAGMA cache_size = -32000;")
     mem_conn.execute("PRAGMA journal_mode = MEMORY;")
     mem_conn.execute("PRAGMA synchronous = OFF;")
     
     return mem_conn
+
 
 # Create engine with StaticPool to reuse the same connection
 engine = create_engine(

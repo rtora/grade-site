@@ -1,6 +1,7 @@
 // API Configuration
 const isDevelopment = false;  // Set this to false before deploying
-const API_BASE_URL = isDevelopment ? 'http://127.0.0.1:5000' : 'https://www.collegegrades.org';
+const API_BASE_URL = '';  // Empty string means use the same domain as the frontend
+// const API_BASE_URL = isDevelopment ? 'http://127.0.0.1:5000' : 'https://www.collegegrades.org';
 
 // Modify your fetch URLs to use the API_BASE_URL
 // Change this line in the autocomplete function:
