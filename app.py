@@ -15,6 +15,7 @@ CORS(app, resources={r"/*": {"origins": [
     "https://collegegrades.org",
     "https://www.collegegrades.org",
     "http://www.collegegrades.org",
+    "https://collegegrades-production.up.railway.app",
     # "http://127.0.0.1:5500",  # Add this for local development
     # "http://localhost:5500"    # Add this for local development
 ]}})
