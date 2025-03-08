@@ -1,6 +1,7 @@
 import sqlite3
 import os
 import sys
+import subprocess
 import requests
 from flask import Flask, request, jsonify, send_from_directory
 from sqlalchemy import create_engine, func, desc
@@ -11,9 +12,8 @@ from flask_cors import CORS
 from flask_caching import Cache
 from pathlib import Path
 
-# Load database at startup with in-memory optimization
 def download_database_file():
-    """Download the database file from Google Drive if needed"""
+    """Download the database file from Google Drive"""
     try:
         db_path = 'university_grades.db'
         app_dir = os.path.dirname(os.path.abspath(__file__))
@@ -21,8 +21,8 @@ def download_database_file():
         
         print(f"Checking for database at: {full_path}", file=sys.stderr)
         
-        # Skip download if file exists
-        if os.path.exists(full_path):
+        # Skip download if file exists and we're in development
+        if os.path.exists(full_path) and os.environ.get('RAILWAY_ENVIRONMENT') is None:
             print(f"Database file already exists at {full_path}, skipping download", file=sys.stderr)
             
             # Verify it's a valid database before continuing
@@ -33,68 +33,130 @@ def download_database_file():
                 return full_path
             except sqlite3.DatabaseError:
                 print(f"Existing database file is invalid, will re-download", file=sys.stderr)
+                # Continue to download
         
-        print(f"Downloading database from Google Drive...", file=sys.stderr)
+        # Install gdown if not already installed
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "gdown"])
+            print("Installed gdown successfully", file=sys.stderr)
+        except Exception as e:
+            print(f"Failed to install gdown: {e}", file=sys.stderr)
+            raise
         
-        # Direct download approach with Google Drive
+        import gdown
+        
+        # Delete existing file if it exists
+        if os.path.exists(full_path):
+            os.remove(full_path)
+            
+        # Google Drive file ID from the URL
         file_id = "1VkzOs-x1Hepee2TbOkmuYfRWo77Q3Thn"
         
-        # First get a confirmation token
-        session = requests.Session()
+        print(f"Downloading database using gdown...", file=sys.stderr)
         
-        url = f"https://drive.google.com/uc?export=download&id={file_id}"
-        response = session.get(url, stream=True)
+        # Use gdown to handle the download - this properly handles Google Drive's redirects and confirmations
+        output = gdown.download(f"https://drive.google.com/uc?id={file_id}", full_path, quiet=False)
         
-        # Look for the download token in the response
-        token = None
-        for key, value in response.cookies.items():
-            if key.startswith('download_warning'):
-                token = value
-                break
+        if output is None:
+            raise Exception("Download failed - gdown returned None")
+            
+        print(f"Database file downloaded to {full_path}", file=sys.stderr)
         
-        if token:
-            url = f"{url}&confirm={token}"
-        
-        # Now download with the token
-        print(f"Downloading from URL: {url}", file=sys.stderr)
-        
-        # Use a decent timeout and stream the response
-        response = session.get(url, stream=True, timeout=120)
-        
-        # Save the file
-        with open(full_path, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=8192): 
-                if chunk:
-                    f.write(chunk)
-        
-        file_size = os.path.getsize(full_path)
-        print(f"Downloaded file (size: {file_size} bytes) to {full_path}", file=sys.stderr)
+        # Verify the file is a valid SQLite database
+        try:
+            conn = sqlite3.connect(full_path)
+            cursor = conn.cursor()
+            cursor.execute("SELECT name FROM sqlite_master LIMIT 1")
+            result = cursor.fetchone()
+            if result:
+                print(f"Downloaded file verified as valid SQLite database", file=sys.stderr)
+            conn.close()
+        except sqlite3.DatabaseError as e:
+            print(f"ERROR: Downloaded file is not a valid SQLite database: {e}", file=sys.stderr)
+            
+            # Check file size
+            file_size = os.path.getsize(full_path)
+            print(f"Downloaded file size: {file_size} bytes", file=sys.stderr)
+            
+            # Peek at file content for debugging
+            try:
+                with open(full_path, 'rb') as f:
+                    header = f.read(100)
+                    print(f"File header bytes: {header}", file=sys.stderr)
+            except Exception as e:
+                print(f"Error reading file header: {e}", file=sys.stderr)
+                
+            raise Exception("Downloaded file is not a valid SQLite database")
         
         # Create indexes
         import create_indexes
         create_indexes.create_indexes(full_path)
         
         return full_path
-            
+        
     except Exception as e:
         print(f"ERROR in download_database_file: {e}", file=sys.stderr)
-        raise
+        # For debugging, use a fallback tiny SQLite database
+        create_empty_db()
+        return 'university_grades.db'
 
-# Create a global database connection at module level
-print("Starting application - loading database into memory at startup", file=sys.stderr)
+def create_empty_db():
+    """Create a tiny empty database for testing when download fails"""
+    try:
+        print("Creating empty database for fallback", file=sys.stderr)
+        conn = sqlite3.connect('university_grades.db')
+        cursor = conn.cursor()
+        
+        # Create a minimal schema matching your model
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS grades (
+            id INTEGER PRIMARY KEY,
+            "A+" FLOAT, A FLOAT, "A-" FLOAT, 
+            "B+" FLOAT, B FLOAT, "B-" FLOAT,
+            "C+" FLOAT, C FLOAT, "C-" FLOAT,
+            "D+" FLOAT, D FLOAT, "D-" FLOAT,
+            F FLOAT, Pass FLOAT, "Not Pass" FLOAT,
+            Satisfactory FLOAT, Unsatisfactory FLOAT, "Not Satisfactory" FLOAT,
+            Incomplete FLOAT, "In Progress" FLOAT, Withdrawn FLOAT,
+            "Withdrawn Passing" FLOAT, "Withdrawn Medical" FLOAT, "Withdrawn Incomplete" FLOAT,
+            Drop FLOAT, "Withdrawn from University" FLOAT, Honors FLOAT,
+            "No Grade" FLOAT, Review FLOAT, Audit FLOAT,
+            "Not Reported" FLOAT, Repeat FLOAT, DFWU FLOAT,
+            "Pending Judicial Action" FLOAT, Withheld FLOAT, "Report In Progress" FLOAT,
+            "I,RD,RP" FLOAT, "w/o I RD RP" FLOAT,
+            instructor TEXT, year INTEGER, "Catalog Number" TEXT,
+            subject TEXT, term TEXT, university TEXT, title TEXT, GPA FLOAT
+        )
+        ''')
+        
+        # Insert a sample record
+        cursor.execute('''
+        INSERT INTO grades (university, subject, year, term) 
+        VALUES ('Example University', 'Sample', 2025, 'Spring')
+        ''')
+        
+        conn.commit()
+        conn.close()
+        print("Created empty database successfully", file=sys.stderr)
+    except Exception as e:
+        print(f"Error creating empty database: {e}", file=sys.stderr)
+
+# Download database at startup
+print("Starting database download process...", file=sys.stderr)
 DB_PATH = download_database_file()
+print(f"Database setup complete. Path: {DB_PATH}", file=sys.stderr)
 
-# Single in-memory connection to be shared by all threads
+# Create a single global in-memory database connection
 DB_CONN = None
 
 def get_memory_connection():
-    """Creates a shared in-memory SQLite connection at startup"""
+    """Creates an in-memory SQLite connection and loads the database into it once"""
     global DB_CONN
     
     if DB_CONN is None:
         print(f"Loading database into memory from: {DB_PATH}", file=sys.stderr)
         
-        # Create a memory database
+        # Create a new in-memory database
         DB_CONN = sqlite3.connect(':memory:', check_same_thread=False)
         
         # Load from disk to memory
@@ -102,22 +164,15 @@ def get_memory_connection():
         disk_conn.backup(DB_CONN)
         disk_conn.close()
         
-        # Optimize SQLite settings for static database
-        DB_CONN.execute("PRAGMA cache_size = -32000;")     # 32MB cache
-        DB_CONN.execute("PRAGMA journal_mode = MEMORY;")   # In-memory journal
-        DB_CONN.execute("PRAGMA synchronous = OFF;")       # No sync for read-only DB
-        DB_CONN.execute("PRAGMA temp_store = MEMORY;")     # Temp tables in memory
-        DB_CONN.execute("PRAGMA mmap_size = 30000000;")    # 30MB memory map
+        # Optimize SQLite settings
+        DB_CONN.execute("PRAGMA cache_size = -32000;")
+        DB_CONN.execute("PRAGMA journal_mode = MEMORY;")
+        DB_CONN.execute("PRAGMA synchronous = OFF;")
         
         print("Database loaded into memory successfully", file=sys.stderr)
     
     return DB_CONN
 
-# Create connection at startup to avoid first-request delay
-DB_CONN = get_memory_connection()
-print("Memory database initialized and ready for queries", file=sys.stderr)
-
-# Create Flask app
 app = Flask(__name__, static_url_path='/static')
 CORS(app, resources={r"/*": {"origins": [
     "http://collegegrades.org",
@@ -128,18 +183,22 @@ CORS(app, resources={r"/*": {"origins": [
     "http://collegegrades-production.up.railway.app",
 ]}})
 
-# Configure Flask-Caching with memory cache
+# Configure Flask-Caching with a simple in-memory cache
 cache_config = {
-    'CACHE_TYPE': 'SimpleCache',  # Memory cache is fine for single worker
+    'CACHE_TYPE': 'SimpleCache',
     'CACHE_DEFAULT_TIMEOUT': 3600
 }
 app.config.from_mapping(cache_config)
 cache = Cache(app)
 
-# SQLAlchemy engine - configured to use our preloaded global connection
+# Pre-load the database into memory at startup
+DB_CONN = get_memory_connection()
+print("Memory database initialized and ready for queries", file=sys.stderr)
+
+# Create engine with StaticPool to reuse the same connection
 engine = create_engine(
     'sqlite://',
-    creator=lambda: DB_CONN,  # Just return the global connection
+    creator=lambda: DB_CONN,  # Return the global connection
     connect_args={'check_same_thread': False},
     poolclass=StaticPool
 )
