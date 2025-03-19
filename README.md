@@ -1,43 +1,48 @@
 # CollegeGrades Deployment Guide
 
-This guide explains how to deploy updates to collegegrades.org, which runs on an AWS EC2 instance.
+This guide explains how to deploy updates to collegegrades.org, which now runs on a Hetzner server.
 
 ## Prerequisites
 
-- Access to the EC2 instance private key (`grade site.pem`)
-- SSH client
+- Access to the Hetzner server private key (`~/.ssh/id_rsa`)
+- SSH client installed on your local machine
 - Local copy of the code repository
 
 ## Deployment Steps
 
-### 1. Copying Files to EC2
+### 1. Copying Files to the Server
 
-From your local machine, copy the updated files to the EC2 instance:
+When copying the project files to the server, make sure **not to copy your environment directory** (in this case, the `myenv` folder). There are a couple of ways to handle this:
+
+#### Option A: Using `scp` and then removing the environment directory
+
+Copy the entire `grade-site` folder, then remove the `myenv` folder on the server:
 
 ```bash
-# Create a temporary directory on EC2 for the files
-ssh -i "grade site.pem" ec2-user@18.119.131.51 "mkdir -p ~/grade-site-temp"
+# Copy the files to the server
+scp -r grade-site root@5.78.113.168:/var/www/collegegrades
 
-# Copy files from local machine to EC2
-scp -i "grade site.pem" -r grade-site/* ec2-user@18.119.131.51:~/grade-site-temp/
+# Remove the environment directory from the server
+ssh root@5.78.113.168 "rm -rf /var/www/collegegrades/myenv"
 ```
 
-### 2. SSH into EC2 Instance
+#### Option B: Using rsync with an exclude flag
+Alternatively, you can use rsync to exclude the environment directory during transfer:
+```bash
+rsync -av --exclude 'myenv' grade-site/ root@5.78.113.168:/var/www/collegegrades
+```
 
-Connect to the EC2 instance:
+### 2. SSH into Hetzner Server
+
+Connect to the server using
 
 ```bash
-ssh -i "grade site.pem" ec2-user@18.119.131.51
+ssh -i ~/.ssh/id_rsa root@5.78.113.168
 ```
 
 ### 3. Deploy Updated Files
 
-Once connected to EC2, copy the files to the web directory:
-
-```bash
-# Copy files to the web directory
-sudo cp -r ~/grade-site-temp/* /var/www/grade-site/
-```
+Once connected, move the copied files into the proper web directory if necessary. In this guide, the files are directly copied to /var/www/collegegrades, so this step may be optional. If you need to copy files from a temporary directory, adjust accordingly.
 
 ### 4. Update Dependencies
 
@@ -48,6 +53,7 @@ cd /var/www/grade-site
 source venv/bin/activate
 sudo venv/bin/pip install -r requirements.txt
 ```
+Note: The virtual environment (venv) should already be set up on the server. Do not copy your local environment directory (myenv).
 
 ### 5. Run Database Indexing
 
@@ -81,7 +87,7 @@ You should see output indicating that the service is "active (running)" with 3 G
 - Application Server: Gunicorn (3 workers)
 - Python Web Framework: Flask
 - Domain: collegegrades.org
-- Server IP: 18.119.131.51
+- Server IP: 5.78.113.168
 - Application Port: 8000 (internal)
 
 ## Troubleshooting
@@ -102,6 +108,10 @@ sudo systemctl status nginx
 ```bash
 sudo journalctl -u app
 ```
+
+4. View Nginx Error Logs: 
+Check the Nginx error logs for any issues with Nginx itself or proxying requests:
+sudo tail -f /var/log/nginx/error.log
 
 ## File Locations
 
