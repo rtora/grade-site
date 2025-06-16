@@ -1,125 +1,62 @@
-# CollegeGrades Deployment Guide
+# CollegeGrades.org
 
-This guide explains how to deploy updates to collegegrades.org, which now runs on a Hetzner server.
+**Live Site:** [https://collegegrades.org](https://collegegrades.org)
 
-## Prerequisites
+[cite_start]A comprehensive grade database and search platform for over 20 universities, providing transparent access to academic records from over one million classes. This project was developed to make grade distribution data easily searchable and accessible to students and faculty.
 
-- Access to the Hetzner server private key (`~/.ssh/id_rsa`)
-- SSH client installed on your local machine
-- Local copy of the code repository
+### Key Features
 
-## Deployment Steps
+* **Advanced Search**: Filter grade data by university, subject, course number, instructor, year, and term.
+* **Aggregate Statistics**: View summed grade distributions and dynamically calculated average GPAs for any search query.
+* **Dynamic Autocomplete**: Fast autocomplete suggestions are provided for all search fields to improve user experience.
+* **Interactive Data Visualization**: Grade distributions are rendered in responsive, dynamic bar charts using Chart.js.
+* **Responsive and User-Friendly UI**: Features a mobile-friendly design and a persistent dark/light mode theme toggle that saves user preference in `localStorage`.
 
-### 1. Copying Files to the Server
+### Technical Architecture & Highlights
 
-When copying the project files to the server, make sure **not to copy your environment directory** (in this case, the `myenv` folder). There are a couple of ways to handle this:
+This project is built with a focus on performance, scalability, and user experience.
 
-#### Option A: Using `scp` and then removing the environment directory
+#### Backend
 
-Copy the entire `grade-site` folder, then remove the `myenv` folder on the server:
+* **Framework & Server**: The application is a **Flask** web server with a REST API to serve grade data. It uses **Gunicorn** as the application server and **Nginx** as a reverse proxy.
+* **Database**:
+    * The application uses **SQLite** for its database, which is automatically downloaded at startup from a cloud source using `gdown`.
+    * **Performance Optimization**: At startup, the entire multi-gigabyte SQLite database is loaded into an **in-memory** connection for millisecond query times.
+    * **Database Indexing**: A dedicated script (`create_indexes.py`) creates indexes on all commonly filtered columns to ensure efficient querying.
+* **API & Performance**:
+    * The API uses **SQLAlchemy** for querying and data modeling.
+    * Common API responses are cached using **Flask-Caching** to reduce database load.
 
-```bash
-# Copy the files to the server
-scp -r grade-site root@5.78.113.168:/var/www/collegegrades
+#### Frontend
 
-# Remove the environment directory from the server
-ssh root@5.78.113.168 "rm -rf /var/www/collegegrades/myenv"
-```
+* **Core Technologies**: Built with vanilla **JavaScript**, **HTML5**, and **CSS** for a fast and lightweight user experience.
+* **Performance**: API calls for the autocomplete search feature are **debounced** to prevent excessive network traffic and improve client-side performance.
+* **Data Visualization**: Uses **Chart.js** to render dynamic and interactive charts from API data.
+* **User Experience**: Improves usability by normalizing search inputs (e.g., 'UCLA' becomes 'UC Los Angeles') via a synonym dictionary and saving user theme preferences in `localStorage`.
 
-#### Option B: Using rsync with an exclude flag
-Alternatively, you can use rsync to exclude the environment directory during transfer:
-```bash
-rsync -av --exclude 'myenv' grade-site/ root@5.78.113.168:/var/www/collegegrades
-```
+### Local Development Setup
 
-### 2. SSH into Hetzner Server
+To run this project locally, follow these steps:
 
-Connect to the server using
+1.  **Clone the repository:**
+    ```bash
+    git clone [your-repo-url]
+    cd [repo-name]
+    ```
+2.  **Create a virtual environment:**
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+3.  **Install dependencies from `requirements.txt`:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+4.  **Run the application:**
+    ```bash
+    flask run
+    ```
+    The application will start, download the necessary database file, and be accessible at `http://127.0.0.1:5000`.
 
-```bash
-ssh -i ~/.ssh/id_rsa root@5.78.113.168
-```
-
-### 3. Deploy Updated Files
-
-Once connected, move the copied files into the proper web directory if necessary. In this guide, the files are directly copied to /var/www/collegegrades, so this step may be optional. If you need to copy files from a temporary directory, adjust accordingly.
-
-### 4. Update Dependencies
-
-If you've made changes to requirements.txt:
-
-```bash
-cd /var/www/grade-site
-source venv/bin/activate
-sudo venv/bin/pip install -r requirements.txt
-```
-Note: The virtual environment (venv) should already be set up on the server. Do not copy your local environment directory (myenv).
-
-### 5. Run Database Indexing
-
-If you've made changes that require database indexing:
-
-```bash
-sudo venv/bin/python create_indexes.py
-```
-
-### 6. Restart the Application
-
-Restart the Gunicorn service:
-
-```bash
-sudo systemctl restart app
-```
-
-### 7. Verify Deployment
-
-Check that the service is running properly:
-
-```bash
-sudo systemctl status app
-```
-
-You should see output indicating that the service is "active (running)" with 3 Gunicorn workers.
-
-## Infrastructure Details
-
-- Web Server: Nginx
-- Application Server: Gunicorn (3 workers)
-- Python Web Framework: Flask
-- Domain: collegegrades.org
-- Server IP: 5.78.113.168
-- Application Port: 8000 (internal)
-
-## Troubleshooting
-
-If the site is not accessible after deployment:
-
-1. Check Gunicorn status:
-```bash
-sudo systemctl status app
-```
-
-2. Check Nginx status:
-```bash
-sudo systemctl status nginx
-```
-
-3. View application logs:
-```bash
-sudo journalctl -u app
-```
-
-4. View Nginx Error Logs: 
-Check the Nginx error logs for any issues with Nginx itself or proxying requests:
-sudo tail -f /var/log/nginx/error.log
-
-## File Locations
-
-- Application Directory: `/var/www/grade-site/`
-- Virtual Environment: `/var/www/grade-site/venv/`
-- Nginx Configuration: `/etc/nginx/conf.d/app.conf`
-- Systemd Service: `/etc/systemd/system/app.service`
-
-## Note
-
-Always make sure to test changes locally before deploying to production. Keep a backup of working code in case you need to rollback changes.
+---
+*For personal deployment notes, see [DEPLOYMENT.md](DEPLOYMENT.md).*
