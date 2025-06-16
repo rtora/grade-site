@@ -1,8 +1,8 @@
 # CollegeGrades.org
 
-**Live Site:** [https://collegegrades.org](https://collegegrades.org)
+**Live Site:** https://collegegrades.org
 
-[cite_start]A comprehensive grade database and search platform for over 20 universities, providing transparent access to academic records from over one million classes. This project was developed to make grade distribution data easily searchable and accessible to students and faculty.
+A comprehensive grade database and search platform for over 20 universities, providing transparent access to academic records from over one million classes. This project was developed to make grade distribution data easily searchable and accessible to students and faculty.
 
 ### Key Features
 
@@ -18,7 +18,7 @@ This project is built with a focus on performance, scalability, and user experie
 
 #### Backend
 
-* **Framework & Server**: The application is a **Flask** web server with a REST API to serve grade data. It uses **Gunicorn** as the application server and **Nginx** as a reverse proxy.
+* **Framework & Server**: The application is a **Flask** web server with a REST API to serve grade data. [cite_start]It uses **Gunicorn** as the application server and **Nginx** as a reverse proxy.
 * **Database**:
     * The application uses **SQLite** for its database, which is automatically downloaded at startup from a cloud source using `gdown`.
     * **Performance Optimization**: At startup, the entire multi-gigabyte SQLite database is loaded into an **in-memory** connection for millisecond query times.
@@ -58,5 +58,6 @@ To run this project locally, follow these steps:
     ```
     The application will start, download the necessary database file, and be accessible at `http://127.0.0.1:5000`.
 
----
+***
+
 *For personal deployment notes, see [DEPLOYMENT.md](DEPLOYMENT.md).*
